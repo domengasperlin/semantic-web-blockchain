@@ -17,17 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-parsers</artifactId>
-            <version>${owlapi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-apibinding</artifactId>
-            <version>${owlapi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-api</artifactId>
+            <artifactId>owlapi-distribution</artifactId>
             <version>${owlapi.version}</version>
         </dependency>
     </dependencies>
