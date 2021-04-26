@@ -1,0 +1,69 @@
+_:genid1774690057 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+# 
+# 
+# #################################################################
+# #
+# #    Data properties
+# #
+# #################################################################
+# 
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/controlontology#hasSize
+<http://www.semanticweb.org/domen/ontologies/2021/3/controlontology#hasSize> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/controlontology#hasSize> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#integer> .
+# 
+# 
+# 
+# #################################################################
+# #
+# #    Classes
+# #
+# #################################################################
+# 
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Create
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Create> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#CreatedDataProperty
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#CreatedDataProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#CreatedDataProperty> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Create> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#CreatedInstance
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#CreatedInstance> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#CreatedInstance> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Create> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#CreatedObjectProperty
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#CreatedObjectProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#CreatedObjectProperty> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Create> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Delete
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Delete> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#DeletedDataProperty
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#DeletedDataProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#DeletedDataProperty> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Delete> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#DeletedInstance
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#DeletedInstance> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#DeletedInstance> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Delete> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#DeletedObjectProperty
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#DeletedObjectProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#DeletedObjectProperty> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Delete> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Update
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Update> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#UpdatedDataProperty
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#UpdatedDataProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#UpdatedDataProperty> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Update> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#UpdatedInstance
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#UpdatedInstance> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#UpdatedInstance> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Update> .
+# 
+# http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#UpdatedObjectProperty
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#UpdatedObjectProperty> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#UpdatedObjectProperty> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/3/untitled-ontology-53#Update> .
+# 
+# Generated by the OWL API (version 4.1.3.20151118-2017) https://github.com/owlcs/owlapi
