@@ -1,11 +1,7 @@
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.formats.FunctionalSyntaxDocumentFormat;
-import org.semanticweb.owlapi.formats.NTriplesDocumentFormat;
 import org.semanticweb.owlapi.formats.TurtleDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
-import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
 
 import java.io.File;
 import java.util.Set;
@@ -30,7 +26,7 @@ public class OntologyHelpers {
         return ontology;
     }
 
-    public void saveTBoxAxiomsToFile() {
+    public void saveTBoxAxiomsToFile(String fileName) {
         Set<OWLAxiom> tBoxAxioms = ontology.getTBoxAxioms(Imports.INCLUDED);
         OWLOntologyManager tBoxManager = OWLManager.createOWLOntologyManager();
         OWLOntology tBoxOntology = null;
@@ -40,10 +36,10 @@ public class OntologyHelpers {
             e.printStackTrace();
         }
         tBoxManager.addAxioms(tBoxOntology, tBoxAxioms);
-        saveOntologyToFile("rdf-sparql/output/tbox-axioms.nt", tBoxOntology, new NTriplesDocumentFormat());
+        saveOntologyToFile(fileName, tBoxOntology, new TurtleDocumentFormat());
     }
 
-    public void saveABoxAxiomsToFile() {
+    public void saveABoxAxiomsToFile(String fileName) {
         Set<OWLAxiom> aBoxAxioms = ontology.getABoxAxioms(Imports.INCLUDED);
         OWLOntologyManager tBoxManager = OWLManager.createOWLOntologyManager();
         OWLOntology aBoxOntology = null;
@@ -53,11 +49,10 @@ public class OntologyHelpers {
             e.printStackTrace();
         }
         tBoxManager.addAxioms(aBoxOntology, aBoxAxioms);
-        saveOntologyToFile("rdf-sparql/output/abox-axioms.ttl", aBoxOntology, new TurtleDocumentFormat());
+        saveOntologyToFile(fileName, aBoxOntology, new TurtleDocumentFormat());
     }
 
-    public void saveRBoxAxiomsToFile() {
-        // Ethereum - TBox - classes and properties
+    public void saveRBoxAxiomsToFile(String fileName) {
         Set<OWLAxiom> rBoxAxioms = ontology.getRBoxAxioms(Imports.INCLUDED);
         OWLOntologyManager rBoxManager = OWLManager.createOWLOntologyManager();
         OWLOntology rBoxOntology = null;
@@ -67,7 +62,7 @@ public class OntologyHelpers {
             e.printStackTrace();
         }
         rBoxManager.addAxioms(rBoxOntology, rBoxAxioms);
-        saveOntologyToFile("rdf-sparql/output/rbox-axioms.ttl", rBoxOntology, new TurtleDocumentFormat());
+        saveOntologyToFile(fileName, rBoxOntology, new TurtleDocumentFormat());
     }
 
     public void saveOntologyToFile(String outputFile, OWLOntology owlOntology, OWLDocumentFormat owlDocumentFormat) {
@@ -79,9 +74,9 @@ public class OntologyHelpers {
         }
     }
 
-    public void outputOntologyToSystemOut() {
+    public void outputOntologyToSystemOut(OWLDocumentFormat owlDocumentFormat) {
         try {
-            ontology.saveOntology(new FunctionalSyntaxDocumentFormat(), System.out);
+            ontology.saveOntology(owlDocumentFormat, System.out);
         } catch (OWLOntologyStorageException e) {
             e.printStackTrace();
         }

@@ -13,8 +13,8 @@ public class JenaHelpers {
         this.model = RDFDataMgr.loadModel(fileName);
     }
 
-    public void executeSPARQLQuery(String queryStr) {
-        Query query = QueryFactory.create(queryStr);
+    public void executeSPARQLQuery(String SPARQLSelectLocation) {
+        Query query = QueryFactory.read(SPARQLSelectLocation);
         QueryExecution qexec = QueryExecutionFactory.create(query, model);
         try {
             ResultSet results = qexec.execSelect();
@@ -27,21 +27,21 @@ public class JenaHelpers {
         }
     }
 
-    public void executeSPARQLInsert() {
+    public void executeSPARQLInsert(String SPARQLInsertLocation) {
         UpdateRequest request = UpdateFactory.create() ;
-        UpdateAction.readExecute("rdf-sparql/input/insert.ru", model) ;
+        UpdateAction.readExecute(SPARQLInsertLocation, model) ;
         UpdateAction.execute(request, model) ;
     }
 
-    public void executeSPARQLUpdate() {
+    public void executeSPARQLUpdate(String SPARQLUpdateLocation) {
         UpdateRequest request = UpdateFactory.create() ;
-        UpdateAction.readExecute("rdf-sparql/input/update.ru", model) ;
+        UpdateAction.readExecute(SPARQLUpdateLocation, model) ;
         UpdateAction.execute(request, model) ;
     }
 
-    public void executeSPARQLDelete() {
+    public void executeSPARQLDelete(String SPARQLDeleteLocation) {
         UpdateRequest request = UpdateFactory.create() ;
-        UpdateAction.readExecute("rdf-sparql/input/delete.ru", model) ;
+        UpdateAction.readExecute(SPARQLDeleteLocation, model) ;
         UpdateAction.execute(request, model) ;
     }
 
