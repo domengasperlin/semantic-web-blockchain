@@ -8,7 +8,6 @@ import java.util.Set;
 
 public class OntologyHelpers {
     public OWLOntology ontology;
-//    private static QueryEngine engine;
 
     public OntologyHelpers(String fileName) {
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();

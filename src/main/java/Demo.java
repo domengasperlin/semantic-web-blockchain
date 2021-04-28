@@ -13,6 +13,8 @@ public class Demo {
     private static String ethereumFolder = "ethereum";
 
     private static String inputOntologyName = rdfSparqlInputFolder+"/input_ontology.owl";
+    private static String inputDBPediaTBox = rdfSparqlInputFolder+"/TBox_DBpedia_ontology_type=parsed.owl";
+    private static String inputDBPediaABox = rdfSparqlInputFolder+"/ABox_DBpedia_instance-types_lang=en_specific.ttl";
     private static String outputOntologyName = rdfSparqlOutputFolder+"/output_ontology.ttl";
 
     private static String aBoxOutputName = rdfSparqlOutputFolder+"/abox-axioms.ttl";
@@ -36,8 +38,8 @@ public class Demo {
     public static void main(String[] args) {
         showcaseOutputOntologyAndOWLAPISchemaDataSeparation();
         demoIPFSFileUploadDownload();
-        showcaseJenaSPARQLOperations();
         demoEthereumStoreAndRetrieveData();
+        showcaseJenaSPARQLOperations();
     }
 
     public static void showcaseOutputOntologyAndOWLAPISchemaDataSeparation() {
@@ -70,7 +72,8 @@ public class Demo {
     }
 
     public static void showcaseJenaSPARQLOperations() {
-        JenaHelpers jenaHelpers = new JenaHelpers(outputOntologyName);
+        JenaHelpers jenaHelpers = new JenaHelpers(outputOntologyName, tBoxOutputName, aBoxOutputName);
+//        JenaHelpers jenaHelpers = new JenaHelpers(outputOntologyName, tBoxOutputName, aBoxOutputName);
         System.out.println("SELECT --------------------------------------------------------------------------------------------");
         jenaHelpers.executeSPARQLQuery(SPARQLSelectLocation);
         System.out.println("INSERT --------------------------------------------------------------------------------------------");
