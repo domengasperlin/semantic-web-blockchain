@@ -7,24 +7,28 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 public class Demo {
 
+    private static String aBoxName = "abox-axioms.nt";
+    private static String rBoxName = "rbox-axioms.ttl";
+    private static String tBoxName = "tbox-axioms.nt";
+
     private static String rdfSparqlOutputFolder = "rdf-sparql/output";
     private static String rdfSparqlInputFolder = "rdf-sparql/input";
     private static String IPFSOutputFolder = "ipfs-files/output";
     private static String ethereumFolder = "ethereum";
 
-    private static String inputOntologyName = rdfSparqlInputFolder+"/input_ontology.owl";
-    private static String inputDBPediaTBox = rdfSparqlInputFolder+"/TBox_DBpedia_ontology_type=parsed.owl";
-    private static String inputDBPediaABox = rdfSparqlInputFolder+"/ABox_DBpedia_instance-types_lang=en_specific.ttl";
-    private static String outputOntologyName = rdfSparqlOutputFolder+"/output_ontology.ttl";
+    private static String inputOntologyFullPath = rdfSparqlInputFolder+"/input_ontology.owl";
+    private static String inputDBPediaTBoxFullPath = rdfSparqlInputFolder+"/TBox_DBpedia_ontology_type=parsed.xml";
+    private static String inputDBPediaABoxFullPath = rdfSparqlInputFolder+"/ABox_DBpedia_instance-types_lang=en_specific.ttl";
+    private static String outputOntologyNameFullPath = rdfSparqlOutputFolder+"/output_ontology.ttl";
 
-    private static String aBoxOutputName = rdfSparqlOutputFolder+"/abox-axioms.ttl";
-    private static String rBoxOutputName = rdfSparqlOutputFolder+"/rbox-axioms.ttl";
-    private static String tBoxOutputName = rdfSparqlOutputFolder+"/tbox-axioms.ttl";
+    private static String aBoxFullPath = rdfSparqlOutputFolder+"/"+aBoxName;
+    private static String rBoxFullPath = rdfSparqlOutputFolder+"/"+rBoxName;
+    private static String tBoxFullPath = rdfSparqlOutputFolder+"/"+tBoxName;
 
     private static String IPFSNodeAddress = "/ip4/127.0.0.1/tcp/5001";
-    private static String IPFSABoxOutputName = IPFSOutputFolder+"/abox-from-ipfs.ttl";
-    private static String IPFSRBoxOutputName = IPFSOutputFolder+"/rbox-from-ipfs.ttl";
-    private static String IPFSTBoxOutputName = IPFSOutputFolder+"/tbox-from-ipfs.ttl";
+    private static String IPFSABoxFullPath = IPFSOutputFolder+"/"+aBoxName;
+    private static String IPFSRBoxFullPath = IPFSOutputFolder+"/"+rBoxName;
+    private static String IPFSTBoxFullPath = IPFSOutputFolder+"/"+tBoxName;
 
     private static String SPARQLSelectLocation = rdfSparqlInputFolder+"/select.ru";
     private static String SPARQLInsertLocation = rdfSparqlInputFolder+"/insert.ru";
@@ -38,16 +42,16 @@ public class Demo {
     public static void main(String[] args) {
         showcaseOutputOntologyAndOWLAPISchemaDataSeparation();
         demoIPFSFileUploadDownload();
-        demoEthereumStoreAndRetrieveData();
         showcaseJenaSPARQLOperations();
+//        demoEthereumStoreAndRetrieveData();
     }
 
     public static void showcaseOutputOntologyAndOWLAPISchemaDataSeparation() {
-        OntologyHelpers ontologyHelpers = new OntologyHelpers(inputOntologyName);
-        ontologyHelpers.saveABoxAxiomsToFile(aBoxOutputName);
-        ontologyHelpers.saveRBoxAxiomsToFile(rBoxOutputName);
-        ontologyHelpers.saveTBoxAxiomsToFile(tBoxOutputName);
-        ontologyHelpers.saveOntologyToFile(outputOntologyName, ontologyHelpers.getOntology(), new TurtleDocumentFormat());
+        OntologyHelpers ontologyHelpers = new OntologyHelpers(inputOntologyFullPath);
+        ontologyHelpers.saveABoxAxiomsToFile(aBoxFullPath);
+        ontologyHelpers.saveRBoxAxiomsToFile(rBoxFullPath);
+        ontologyHelpers.saveTBoxAxiomsToFile(tBoxFullPath);
+        ontologyHelpers.saveOntologyToFile(outputOntologyNameFullPath, ontologyHelpers.getOntology(), new TurtleDocumentFormat());
     }
 
     public static void demoIPFSFileUploadDownload() {
@@ -55,9 +59,9 @@ public class Demo {
         IPFSHelpers ipfsHelpers = new IPFSHelpers(ipfs);
 
         // Upload file to IPFS
-        Multihash aBoxFileHash = ipfsHelpers.uploadLocalFile(aBoxOutputName);
-        Multihash rBoxFileHash = ipfsHelpers.uploadLocalFile(rBoxOutputName);
-        Multihash tBoxFileHash = ipfsHelpers.uploadLocalFile(tBoxOutputName);
+        Multihash aBoxFileHash = ipfsHelpers.uploadLocalFile(aBoxFullPath);
+        Multihash rBoxFileHash = ipfsHelpers.uploadLocalFile(rBoxFullPath);
+        Multihash tBoxFileHash = ipfsHelpers.uploadLocalFile(tBoxFullPath);
         System.out.println("tBox hash:"+tBoxFileHash);
 
         // Get file contents from IPFS
@@ -66,14 +70,14 @@ public class Demo {
         String tBoxContents = ipfsHelpers.retrieveFileContents(tBoxFileHash.toString());
 
         // Save file contents from IPFS to local file system
-        ipfsHelpers.retrieveFileAndSaveItToLocalSystem(aBoxFileHash.toString(), IPFSABoxOutputName);
-        ipfsHelpers.retrieveFileAndSaveItToLocalSystem(rBoxFileHash.toString(), IPFSRBoxOutputName);
-        ipfsHelpers.retrieveFileAndSaveItToLocalSystem(tBoxFileHash.toString(), IPFSTBoxOutputName);
+        ipfsHelpers.retrieveFileAndSaveItToLocalSystem(aBoxFileHash.toString(), IPFSABoxFullPath);
+        ipfsHelpers.retrieveFileAndSaveItToLocalSystem(rBoxFileHash.toString(), IPFSRBoxFullPath);
+        ipfsHelpers.retrieveFileAndSaveItToLocalSystem(tBoxFileHash.toString(), IPFSTBoxFullPath);
     }
 
     public static void showcaseJenaSPARQLOperations() {
-        JenaHelpers jenaHelpers = new JenaHelpers(outputOntologyName, tBoxOutputName, aBoxOutputName);
-//        JenaHelpers jenaHelpers = new JenaHelpers(outputOntologyName, tBoxOutputName, aBoxOutputName);
+        JenaHelpers jenaHelpers = new JenaHelpers(outputOntologyNameFullPath, tBoxFullPath, aBoxFullPath);
+//        JenaHelpers jenaHelpers = new JenaHelpers(outputOntologyNameFullPath, inputDBPediaTBoxFullPath, inputDBPediaABoxFullPath);
         System.out.println("SELECT --------------------------------------------------------------------------------------------");
         jenaHelpers.executeSPARQLQuery(SPARQLSelectLocation);
         System.out.println("INSERT --------------------------------------------------------------------------------------------");
@@ -106,7 +110,7 @@ public class Demo {
 
         WebHelpers webHelpers = new WebHelpers(ethereumNodeAddress, credentials);
         String contractAddress = webHelpers.deployStorageContract();
-        TransactionReceipt storeTransactionReceipt = webHelpers.loadStorageContractAndCallStoreMethod(contractAddress, tBoxOutputName);
+        TransactionReceipt storeTransactionReceipt = webHelpers.loadStorageContractAndCallStoreMethod(contractAddress, tBoxFullPath);
         String storeTransactionHash = storeTransactionReceipt.getTransactionHash();
         System.out.println("Store data transaction: "+storeTransactionHash);
         String storedSchema = webHelpers.loadStorageContractAndCallRetrieveMethod(contractAddress);

@@ -1,4 +1,3 @@
-import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Model;
@@ -8,6 +7,7 @@ import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.reasoner.ValidityReport;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.tdb.TDBFactory;
 import org.apache.jena.update.UpdateAction;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
@@ -17,15 +17,41 @@ import java.util.Iterator;
 
 public class JenaHelpers {
     Model model;
-//    Dataset dataset;
+    private static boolean doInitialLoad = true;
+    private static String tBoxLocation = "target/TDB/tbox";
+    private static String aBoxLocation = "target/TDB/abox";
+    Model tBoxSchema;
+    Model aBoxFacts;
     public JenaHelpers(String fullOntologyFileName, String tBoxFileName, String aBoxFileName) {
         this.model = RDFDataMgr.loadModel(fullOntologyFileName);
 
-        Model tBoxSchema = FileManager.get().loadModel(tBoxFileName);
-        Model aBoxFacts = FileManager.get().loadModel(aBoxFileName);
+        FileManager fm = FileManager.get();
+
+        if (doInitialLoad) {
+            Dataset tBoxDataset = TDBFactory.createDataset(tBoxLocation);
+            tBoxDataset.begin(ReadWrite.WRITE);
+            this.tBoxSchema = fm.readModel(tBoxDataset.getDefaultModel(), tBoxFileName);
+            tBoxDataset.commit();
+            tBoxDataset.end();
+        } else {
+            Dataset dataset = TDBFactory.createDataset(tBoxLocation);
+            this.tBoxSchema = dataset.getDefaultModel();
+        }
+
+        if (doInitialLoad) {
+            Dataset aBoxDataset = TDBFactory.createDataset(aBoxLocation);
+            aBoxDataset.begin(ReadWrite.WRITE);
+            this.aBoxFacts = fm.readModel(aBoxDataset.getDefaultModel(), aBoxFileName);
+            aBoxDataset.commit();
+            aBoxDataset.end();
+        } else {
+            Dataset dataset = TDBFactory.createDataset(aBoxLocation);
+            this.aBoxFacts = dataset.getDefaultModel();
+        }
+
         // TODO: reasoner should be used when querying OWL ontology
-        Reasoner reasoner = ReasonerRegistry.getOWLReasoner().bindSchema(tBoxSchema.getGraph());
-        InfModel infModel = ModelFactory.createInfModel(reasoner, aBoxFacts);
+        Reasoner reasoner = ReasonerRegistry.getOWLReasoner().bindSchema(this.tBoxSchema);
+        InfModel infModel = ModelFactory.createInfModel(reasoner, this.aBoxFacts);
 
         ValidityReport validityReport = infModel.validate();
 

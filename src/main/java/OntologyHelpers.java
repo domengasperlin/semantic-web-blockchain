@@ -1,4 +1,5 @@
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.formats.NTriplesDocumentFormat;
 import org.semanticweb.owlapi.formats.TurtleDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
@@ -25,6 +26,17 @@ public class OntologyHelpers {
         return ontology;
     }
 
+    public OWLDocumentFormat chooseCorrectFormat(String fileName) {
+        if (fileName.contains("ttl")) {
+            return new TurtleDocumentFormat();
+        }
+        if (fileName.contains("nt")) {
+            return new NTriplesDocumentFormat();
+        }
+        System.out.println("chooseCorrectFormat could not guess format from file extension");
+        return null;
+    }
+
     public void saveTBoxAxiomsToFile(String fileName) {
         Set<OWLAxiom> tBoxAxioms = ontology.getTBoxAxioms(Imports.INCLUDED);
         OWLOntologyManager tBoxManager = OWLManager.createOWLOntologyManager();
@@ -35,7 +47,7 @@ public class OntologyHelpers {
             e.printStackTrace();
         }
         tBoxManager.addAxioms(tBoxOntology, tBoxAxioms);
-        saveOntologyToFile(fileName, tBoxOntology, new TurtleDocumentFormat());
+        saveOntologyToFile(fileName, tBoxOntology, chooseCorrectFormat(fileName));
     }
 
     public void saveABoxAxiomsToFile(String fileName) {
@@ -48,7 +60,7 @@ public class OntologyHelpers {
             e.printStackTrace();
         }
         tBoxManager.addAxioms(aBoxOntology, aBoxAxioms);
-        saveOntologyToFile(fileName, aBoxOntology, new TurtleDocumentFormat());
+        saveOntologyToFile(fileName, aBoxOntology, chooseCorrectFormat(fileName));
     }
 
     public void saveRBoxAxiomsToFile(String fileName) {
@@ -61,21 +73,13 @@ public class OntologyHelpers {
             e.printStackTrace();
         }
         rBoxManager.addAxioms(rBoxOntology, rBoxAxioms);
-        saveOntologyToFile(fileName, rBoxOntology, new TurtleDocumentFormat());
+        saveOntologyToFile(fileName, rBoxOntology, chooseCorrectFormat(fileName));
     }
 
     public void saveOntologyToFile(String outputFile, OWLOntology owlOntology, OWLDocumentFormat owlDocumentFormat) {
         try {
             File outputOntology = new File(outputFile);
             owlOntology.saveOntology(owlDocumentFormat, IRI.create(outputOntology.toURI()));
-        } catch (OWLOntologyStorageException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void outputOntologyToSystemOut(OWLDocumentFormat owlDocumentFormat) {
-        try {
-            ontology.saveOntology(owlDocumentFormat, System.out);
         } catch (OWLOntologyStorageException e) {
             e.printStackTrace();
         }
