@@ -18,7 +18,7 @@ public class Demo {
 
     private static String inputOntologyFullPath = rdfSparqlInputFolder+"/input_ontology.owl";
     private static String inputDBPediaTBoxFullPath = rdfSparqlInputFolder+"/TBox_DBpedia_ontology_type=parsed.xml";
-    private static String inputDBPediaABoxFullPath = rdfSparqlInputFolder+"/ABox_DBpedia_instance-types_lang=en_specific.ttl";
+    private static String inputDBPediaABoxFullPath = rdfSparqlInputFolder+"/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz";
     private static String outputOntologyNameFullPath = rdfSparqlOutputFolder+"/output_ontology.ttl";
 
     private static String aBoxFullPath = rdfSparqlOutputFolder+"/"+aBoxName;
