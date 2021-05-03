@@ -27,14 +27,14 @@ public class WebHelpers {
         return helloWorld.getContractAddress();
     }
 
-    public TransactionReceipt loadStorageContractAndCallStoreMethod(String contractAddress, String fileToBeStoredName) {
+    public TransactionReceipt loadStorageContractAndCallStoreMethod(String contractAddress, String tBoxCID, String aBoxCID) {
         TransactionReceipt storedTransactionReceipt = null;
         try {
             Storage storage = Storage.load(contractAddress, web3, credentials, new DefaultGasProvider());
             if (storage.isValid()) {
-                File file = new File(fileToBeStoredName);
-                String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                storedTransactionReceipt = storage.store(content).send();
+//                File file = new File(fileToBeStoredName);
+//                String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+                storedTransactionReceipt = storage.storeTBoxABox(tBoxCID, aBoxCID).send();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -42,16 +42,19 @@ public class WebHelpers {
         return storedTransactionReceipt;
     }
 
-    public String loadStorageContractAndCallRetrieveMethod(String contractAddress) {
-        String storedSchema = null;
+    public String[] loadStorageContractAndCallRetrieveMethod(String contractAddress) {
+        String tBoxCID = null;
+        String aBoxCID = null;
         try {
             Storage storageContract = Storage.load(contractAddress, web3, credentials, new DefaultGasProvider());
             if (storageContract.isValid()) {
-                storedSchema = storageContract.retrieve().send();
+                tBoxCID = storageContract.getTBox().send();
+                aBoxCID = storageContract.getABox().send();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return storedSchema;
+
+        return new String[]{tBoxCID, aBoxCID};
     }
 }

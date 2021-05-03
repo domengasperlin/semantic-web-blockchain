@@ -22,9 +22,7 @@ public class JenaHelpers {
     private static String aBoxLocation = "target/TDB/abox";
     Model tBoxSchema;
     Model aBoxFacts;
-    public JenaHelpers(String fullOntologyFileName, String tBoxFileName, String aBoxFileName) {
-        this.model = RDFDataMgr.loadModel(fullOntologyFileName);
-
+    public JenaHelpers(String tBoxFileName, String aBoxFileName) {
         FileManager fm = FileManager.get();
 
         if (doInitialLoad) {
@@ -66,6 +64,7 @@ public class JenaHelpers {
         } else {
             System.out.println("Ontology is consistent");
         }
+        this.model = this.tBoxSchema.add(this.aBoxFacts);
     }
 
     public void executeSPARQLQuery(String SPARQLSelectLocation) {

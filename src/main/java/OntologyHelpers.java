@@ -9,6 +9,8 @@ import java.util.Set;
 
 public class OntologyHelpers {
     public OWLOntology ontology;
+    private String aBoxHash;
+    private String tBoxHash;
 
     public OntologyHelpers(String fileName) {
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -20,6 +22,22 @@ public class OntologyHelpers {
 //        StructuralReasonerFactory factory = new StructuralReasonerFactory();
 //        OWLReasoner reasoner = factory.createReasoner(ontology);
 //        engine = QueryEngine.create(manager, reasoner, true);
+    }
+
+    public String getaBoxHash() {
+        return aBoxHash;
+    }
+
+    public void setaBoxHash(String aBoxHash) {
+        this.aBoxHash = aBoxHash;
+    }
+
+    public String gettBoxHash() {
+        return tBoxHash;
+    }
+
+    public void settBoxHash(String tBoxHash) {
+        this.tBoxHash = tBoxHash;
     }
 
     public OWLOntology getOntology() {
