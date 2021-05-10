@@ -16,7 +16,7 @@ public class Demo {
     private static String IPFSOutputFolder = "ipfs-files/output";
     private static String ethereumFolder = "ethereum"; 
 
-    private static String inputOntologyFullPath = rdfSparqlInputFolder+"/input_ontology.owl";
+    private static String inputOntologyFullPath = rdfSparqlInputFolder+"/izobrazevanje.owl";
     private static String inputDBPediaTBoxFullPath = rdfSparqlInputFolder+"/TBox_DBpedia_ontology_type=parsed.xml";
     private static String inputDBPediaABoxFullPath = rdfSparqlInputFolder+"/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz";
 
@@ -60,6 +60,7 @@ public class Demo {
         System.out.println("[IPFS download and write to files] ");
         downloadDataDownstream(ipfs, aBoxCID, tBoxCID);
         System.out.println("[Load files to triplestore and run SPARQL] ");
+        // TODO: Update showcase for the new demo ontology
         showcaseJenaSPARQLOperations();
     }
 
@@ -69,7 +70,7 @@ public class Demo {
         Credentials credentials = null;
 
         if (ethereumNodeAddress.contains("localhost")) {
-            String  privateKey= "1d0c3d2b4ed66c966bc477ed68ece830a19b66ed06362cf22626d6e16e761dab"; // Add a private key here
+            String  privateKey= "97b3900860ef91192f7cdfe3a9268bd2e9c6a245994d513297dcf7e0a1d55d32"; // Add a private key here
             credentials = Credentials.create(privateKey);
         } else {
             try {

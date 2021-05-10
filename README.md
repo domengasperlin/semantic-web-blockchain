@@ -15,7 +15,7 @@ mvn clean package
 ### Run Ethereum node (local) or
 ```bash
 npm install -g ganache-cli
-ganache-cli -h 0.0.0.0 -d -m "outdoor clog there raccoon boy silent hidden shiver federal crouch equip correct"
+ganache-cli -h 0.0.0.0 -d -m "example onion where village dignity affair lady inject spray car bomb two"
 # set ethereumNodeAddress to "http://localhost:8545"
 ```
 ### Run Ethereum node Infura
