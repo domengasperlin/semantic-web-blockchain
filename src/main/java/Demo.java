@@ -3,6 +3,7 @@ import io.ipfs.api.IPFS;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 
 public class Demo {
 
@@ -33,7 +34,9 @@ public class Demo {
     private static String SPARQLUpdateLocation = rdfSparqlInputFolder+"/update.ru";
     private static String SPARQLDeleteLocation = rdfSparqlInputFolder+"/delete.ru";
 
-    private static String ethereumNodeAddress = "https://rinkeby.infura.io/v3/18b69a4069f7455ba4486efd1f5530b1";
+//    private static String ethereumNodeAddress = "https://rinkeby.infura.io/v3/18b69a4069f7455ba4486efd1f5530b1";
+    private static String ethereumNodeAddress = "http://localhost:7545";
+
     private static String ethereumWalletLocation = ethereumFolder+"/wallet--c261cf8e7283030d0b6fa672b5d15819c8d99aa3";
     private static String ethereumWalletPassword = "demo";
 
@@ -62,11 +65,18 @@ public class Demo {
 
 
     public static String storeDataOnEthereumAndGetContractAddress(String tBoxCID, String aBoxCID) {
+
         Credentials credentials = null;
-        try {
-            credentials = WalletUtils.loadCredentials(ethereumWalletPassword, ethereumWalletLocation);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        if (ethereumNodeAddress.contains("localhost")) {
+            String  privateKey= "1d0c3d2b4ed66c966bc477ed68ece830a19b66ed06362cf22626d6e16e761dab"; // Add a private key here
+            credentials = Credentials.create(privateKey);
+        } else {
+            try {
+                credentials = WalletUtils.loadCredentials(ethereumWalletPassword, ethereumWalletLocation);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         WebHelpers webHelpers = new WebHelpers(ethereumNodeAddress, credentials);

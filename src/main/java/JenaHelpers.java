@@ -18,8 +18,8 @@ import java.util.Iterator;
 public class JenaHelpers {
     Model model;
     private static boolean doInitialLoad = true;
-    private static String tBoxLocation = "target/TDB/tbox";
-    private static String aBoxLocation = "target/TDB/abox";
+    private static String tBoxLocation = "target/tbox";
+    private static String aBoxLocation = "target/abox";
     Model tBoxSchema;
     Model aBoxFacts;
     public JenaHelpers(String tBoxFileName, String aBoxFileName) {
