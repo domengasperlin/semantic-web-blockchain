@@ -1,76 +1,88 @@
-import contracts.Storage;
 import io.ipfs.api.IPFS;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.protocol.core.methods.response.Web3ClientVersion;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
+// TODO: demonstrate inconsistencies, improve efficiency of checking for consistency for large datasets
+// Remove duplicate code...
+// Fix error in web3:generate sources and build new smart contracts
 public class Demo {
+    public static ConfigLoader configLoader;
+    public static ArrayList<String> loadFromFiles;
+    public static ArrayList<LinkedHashMap<String, String>> dumpToFiles;
+    public static ArrayList<String> SPARQLQueries;
 
-    private static String aBoxName = "abox-axioms.nt";
-    private static String rBoxName = "rbox-axioms.ttl";
-    private static String tBoxName = "tbox-axioms.nt";
-
-    private static String rdfSparqlOutputFolder = "rdf-sparql/output";
-    private static String rdfSparqlInputFolder = "rdf-sparql/input";
-    private static String IPFSOutputFolder = "ipfs-files/output";
-    private static String ethereumFolder = "ethereum"; 
-
-    private static String inputOntologyFullPath = rdfSparqlInputFolder+"/izobrazevanje.owl";
-    private static String inputDBPediaTBoxFullPath = rdfSparqlInputFolder+"/TBox_DBpedia_ontology_type=parsed.xml";
-    private static String inputDBPediaABoxFullPath = rdfSparqlInputFolder+"/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz";
-
-    private static String aBoxFullPath = rdfSparqlOutputFolder+"/"+aBoxName;
-    private static String rBoxFullPath = rdfSparqlOutputFolder+"/"+rBoxName;
-    private static String tBoxFullPath = rdfSparqlOutputFolder+"/"+tBoxName;
-
-    private static String IPFSNodeAddress = "/ip4/127.0.0.1/tcp/5001";
-    private static String IPFSABoxFullPath = IPFSOutputFolder+"/"+aBoxName;
-    private static String IPFSRBoxFullPath = IPFSOutputFolder+"/"+rBoxName;
-    private static String IPFSTBoxFullPath = IPFSOutputFolder+"/"+tBoxName;
-
-    private static String SPARQLSelectLocation = rdfSparqlInputFolder+"/select.ru";
-    private static String SPARQLInsertLocation = rdfSparqlInputFolder+"/insert.ru";
-    private static String SPARQLUpdateLocation = rdfSparqlInputFolder+"/update.ru";
-    private static String SPARQLDeleteLocation = rdfSparqlInputFolder+"/delete.ru";
-
-//    private static String ethereumNodeAddress = "https://rinkeby.infura.io/v3/18b69a4069f7455ba4486efd1f5530b1";
-    private static String ethereumNodeAddress = "http://localhost:7545";
-
-    private static String ethereumWalletLocation = ethereumFolder+"/wallet--c261cf8e7283030d0b6fa672b5d15819c8d99aa3";
-    private static String ethereumWalletPassword = "demo";
+    public static String IPFSNodeAddress;
+    public static String ethereumWalletLocation;
+    public static String ethereumNodeAddress;
+    public static String ethereumWalletPassword;
 
     // TODO: handle rBox in model
+    // TODO: check if rbox is required
     public static void main(String[] args) {
-        IPFSHelpers ipfs = new IPFSHelpers(new IPFS(IPFSNodeAddress));
-        String aBoxCID;
-        String tBoxCID;
+        // Init
+        configLoader = new ConfigLoader("src/main/java/config.yaml");
 
-        // Get hashes from Ethereum for aBox, tBox, rBox
-        OntologyHelpers ontologyHelpers = localDataSchemaSplitAndUploadToIPFS(ipfs);
-        aBoxCID = ontologyHelpers.getaBoxHash();
-        tBoxCID = ontologyHelpers.gettBoxHash();
+        loadFromFiles = (ArrayList<String>)configLoader.getOntology().get("loadFromFiles");
+        dumpToFiles = (ArrayList<LinkedHashMap<String, String>>)configLoader.getOntology().get("dumpToFiles");
+        SPARQLQueries = (ArrayList<String>)configLoader.getOntology().get("SPARQLQueries");
+        IPFSNodeAddress = (String)configLoader.getIPFS().get("nodeAddress");
+        ethereumWalletLocation = (String)configLoader.getEthereum().get("walletPath");
+        ethereumNodeAddress = (String)configLoader.getEthereum().get("nodeAddress");
+        ethereumWalletPassword = (String)configLoader.getEthereum().get("walletPassword");
+
+        IPFSHelpers ipfs = new IPFSHelpers(new IPFS(IPFSNodeAddress));
+
+        String aBoxFullPath = null;
+        String tBoxFullPath = null;
+        if (loadFromFiles.size() < 1) {
+            System.out.println("Must have at least 1 input ontology");
+            return;
+        }
+        if (dumpToFiles.size() < 3) {
+            System.out.println("Dump files must contain rbox, abox, tbox files");
+            return;
+        }
+        for (LinkedHashMap<String, String> el : dumpToFiles) {
+            if (el.containsKey("abox")) {
+                aBoxFullPath = el.get("abox");
+            }
+            if (el.containsKey("tbox")) {
+                tBoxFullPath = el.get("tbox");
+            }
+            System.out.println(el);
+        }
+        // Separate schema and data
+        OntologyHelpers ontologyHelpers = localDataSchemaSplitAndSaveToFile(aBoxFullPath, tBoxFullPath);
+        // Upload schema and data files to IPFS
+        String aBoxCID = ipfs.uploadLocalFile(aBoxFullPath).toString();
+        String tBoxCID = ipfs.uploadLocalFile(tBoxFullPath).toString();
         System.out.println("[IPFS upload] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID);
+        // Store schema and data CIDs to Ethereum
         String contractAddress = storeDataOnEthereumAndGetContractAddress(tBoxCID, aBoxCID);
+        // Retrieve schema and data pointers from Ethereum
         String[] ontology = retrieveIPFSHashesForSchemaAndDataFromEthereum(contractAddress);
         tBoxCID = ontology[0];
         aBoxCID = ontology[1];
 
         System.out.println("[ETH retrieve] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID);
         System.out.println("[IPFS download and write to files] ");
+        // Download data from IPFS
         downloadDataDownstream(ipfs, aBoxCID, tBoxCID);
         System.out.println("[Load files to triplestore and run SPARQL] ");
         // TODO: Update showcase for the new demo ontology
+        // Load the schema and data files into the Apache Jena
         showcaseJenaSPARQLOperations();
     }
 
-
     public static String storeDataOnEthereumAndGetContractAddress(String tBoxCID, String aBoxCID) {
-
         Credentials credentials = null;
 
-        if (ethereumNodeAddress.contains("localhost")) {
-            String  privateKey= "97b3900860ef91192f7cdfe3a9268bd2e9c6a245994d513297dcf7e0a1d55d32"; // Add a private key here
+        if (configLoader.isDevelopment()) {
+            // Demo Ganache account
+            String privateKey= "97b3900860ef91192f7cdfe3a9268bd2e9c6a245994d513297dcf7e0a1d55d32";
             credentials = Credentials.create(privateKey);
         } else {
             try {
@@ -101,21 +113,75 @@ public class Demo {
         return contractCIDs;
     }
 
-    public static OntologyHelpers localDataSchemaSplitAndUploadToIPFS(IPFSHelpers ipfsHelpers) {
+    public static OntologyHelpers localDataSchemaSplitAndSaveToFile(String aBoxFullPath, String tBoxFullPath) {
+//      TODO: extend to load all files
+        String inputOntologyFullPath = loadFromFiles.get(0);
         OntologyHelpers ontologyHelpers = new OntologyHelpers(inputOntologyFullPath);
+        // Save to file and upload to IPFS
         ontologyHelpers.saveABoxAxiomsToFile(aBoxFullPath);
-        ontologyHelpers.setaBoxHash(ipfsHelpers.uploadLocalFile(aBoxFullPath).toString());
         ontologyHelpers.saveTBoxAxiomsToFile(tBoxFullPath);
-        ontologyHelpers.settBoxHash(ipfsHelpers.uploadLocalFile(tBoxFullPath).toString());
         return ontologyHelpers;
     }
 
     public static void downloadDataDownstream(IPFSHelpers ipfsHelpers, String aBoxFileHash, String tBoxFileHash) {
+        if (dumpToFiles.size() < 3) {
+            System.out.println("Dump files must contain rbox, abox, tbox files");
+            return;
+        }
+        String aBoxFullPath = null;
+        String tBoxFullPath = null;
+        for (LinkedHashMap<String, String> el : dumpToFiles) {
+            if (el.containsKey("abox")) {
+                aBoxFullPath = el.get("abox");
+            }
+            if (el.containsKey("tbox")) {
+                tBoxFullPath = el.get("tbox");
+            }
+            System.out.println(el);
+        }
         ipfsHelpers.retrieveFileAndSaveItToLocalSystem(aBoxFileHash, aBoxFullPath);
         ipfsHelpers.retrieveFileAndSaveItToLocalSystem(tBoxFileHash, tBoxFullPath);
     }
 
     public static void showcaseJenaSPARQLOperations() {
+        if (dumpToFiles.size() < 3) {
+            System.out.println("Dump files must contain rbox, abox, tbox files");
+            return;
+        }
+        String aBoxFullPath = null;
+        String tBoxFullPath = null;
+        for (LinkedHashMap<String, String> el : dumpToFiles) {
+            if (el.containsKey("abox")) {
+                aBoxFullPath = el.get("abox");
+            }
+            if (el.containsKey("tbox")) {
+                tBoxFullPath = el.get("tbox");
+            }
+            System.out.println(el);
+        }
+        if (SPARQLQueries.size() < 4) {
+            System.out.println("For this demo you must specify select");
+            return;
+        }
+        String SPARQLSelectLocation = null;
+        String SPARQLInsertLocation = null;
+        String SPARQLDeleteLocation = null;
+        String SPARQLUpdateLocation = null;
+        for(String query : SPARQLQueries) {
+            if (query.contains("select")) {
+                SPARQLSelectLocation = query;
+            }
+            if (query.contains("insert")) {
+                SPARQLInsertLocation = query;
+            }
+            if (query.contains("update")) {
+                SPARQLUpdateLocation = query;
+            }
+            if (query.contains("delete")) {
+                SPARQLDeleteLocation = query;
+            }
+        }
+
         JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath);
 //        JenaHelpers jenaHelpers = new JenaHelpers(inputDBPediaTBoxFullPath, inputDBPediaABoxFullPath);
         System.out.println("SELECT --------------------------------------------------------------------------------------------");

@@ -1,0 +1,21 @@
+env: development
+ontology:
+  loadFromFiles:
+    - rdf-sparql/input/izobrazevanje.owl
+  #  - TBox_DBpedia_ontology_type=parsed.xml
+  #  - ABox_DBpedia_instance-types_lang=en_specific.ttl.gz
+  dumpToFiles:
+    - rbox: ipfs-files/output/rbox-axioms.ttl
+    - abox: ipfs-files/output/abox-axioms.nt
+    - tbox: ipfs-files/output/tbox-axioms.nt
+  SPARQLQueries:
+    - rdf-sparql/input/select.ru
+    - rdf-sparql/input/insert.ru
+    - rdf-sparql/input/update.ru
+    - rdf-sparql/input/delete.ru
+IPFS:
+  nodeAddress: /ip4/127.0.0.1/tcp/5001
+ethereum:
+  nodeAddress: http://localhost:7545 # https://rinkeby.infura.io/v3/18b69a4069f7455ba4486efd1f5530b1
+  walletPath: ethereum/wallet--c261cf8e7283030d0b6fa672b5d15819c8d99aa3
+  walletPassword: demo

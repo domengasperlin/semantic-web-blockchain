@@ -16,9 +16,9 @@
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#je_vpisan
 :je_vpisan rdf:type owl:ObjectProperty ;
            rdfs:subPropertyOf owl:topObjectProperty ;
+           rdf:type owl:AsymmetricProperty ;
            rdfs:domain :Študent ;
-           rdfs:range :Predmet ,
-                      :Univerza .
+           rdfs:range :Predmet .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#je_članica
@@ -32,14 +32,13 @@
 :obiskuje rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf owl:topObjectProperty ;
           rdfs:domain :Študent ;
-          rdfs:range :Letnik ,
-                     :Predmet ,
-                     :Univerza .
+          rdfs:range :Letnik .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava
 :predava rdf:type owl:ObjectProperty ;
          rdfs:subPropertyOf owl:topObjectProperty ;
+         rdf:type owl:AsymmetricProperty ;
          rdfs:domain :Profesor ;
          rdfs:range :Predmet .
 
@@ -77,7 +76,13 @@
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik
-:Letnik rdf:type owl:Class .
+:Letnik rdf:type owl:Class ;
+        owl:equivalentClass [ rdf:type owl:Class ;
+                              owl:oneOf ( :Drugi_Letnik
+                                          :Prvi_letnik
+                                          :Tretji_letnik
+                                        )
+                            ] .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski
@@ -90,7 +95,8 @@
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor
-:Profesor rdf:type owl:Class .
+:Profesor rdf:type owl:Class ;
+          owl:disjointWith :Študent .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza
@@ -141,6 +147,16 @@
                                     :Predmet ;
                            :obiskuje :Obdelava_naravnega_jezika ;
                            :se_izvaja :Fakulteta_za_računalništvo_in_informatiko .
+
+
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Prvi_letnik
+:Prvi_letnik rdf:type owl:NamedIndividual ,
+                      :Letnik .
+
+
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Tretji_letnik
+:Tretji_letnik rdf:type owl:NamedIndividual ,
+                        :Letnik .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza_v_Ljubljani

@@ -15,6 +15,7 @@
         <web3j.version>5.0.0</web3j.version>
         <ipfs.version>1.3.3</ipfs.version>
         <jena.version>3.0.0</jena.version>
+        <org.snakeyaml.version>1.28</org.snakeyaml.version>
     </properties>
 
     <repositories>
@@ -25,6 +26,11 @@
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${org.snakeyaml.version}</version>
+        </dependency>
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-distribution</artifactId>
@@ -60,7 +66,10 @@
                 <artifactId>web3j-maven-plugin</artifactId>
                 <version>4.6.5</version>
                 <configuration>
-                    <soliditySourceFiles/>
+                    <soliditySourceFiles>
+                        <directory>src/main/resources</directory>
+                        <include>**/*.sol</include>
+                    </soliditySourceFiles>
                     <packageName>contracts</packageName>
                 </configuration>
                 <executions>
