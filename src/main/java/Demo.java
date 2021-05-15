@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 // TODO: demonstrate inconsistencies, improve efficiency of checking for consistency for large datasets
+// TODO: check if rbox is required, handle rBox in model
 // Remove duplicate code...
 // Fix error in web3:generate sources and build new smart contracts
 public class Demo {
@@ -19,8 +20,6 @@ public class Demo {
     public static String ethereumNodeAddress;
     public static String ethereumWalletPassword;
 
-    // TODO: handle rBox in model
-    // TODO: check if rbox is required
     public static void main(String[] args) {
         // Init
         configLoader = new ConfigLoader("src/main/java/config.yaml");

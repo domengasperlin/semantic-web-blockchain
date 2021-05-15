@@ -59,30 +59,5 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.web3j</groupId>
-                <artifactId>web3j-maven-plugin</artifactId>
-                <version>4.6.5</version>
-                <configuration>
-                    <soliditySourceFiles>
-                        <directory>src/main/resources</directory>
-                        <include>**/*.sol</include>
-                    </soliditySourceFiles>
-                    <packageName>contracts</packageName>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>package</id>
-                        <goals>
-                            <goal>generate-sources</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
 
 </project>
