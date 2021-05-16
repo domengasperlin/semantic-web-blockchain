@@ -13,26 +13,35 @@
 #    Object Properties
 #################################################################
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#je_vpisan
-:je_vpisan rdf:type owl:ObjectProperty ;
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaPredavatelja
+:imaPredavatelja rdf:type owl:ObjectProperty ;
+                 rdfs:subPropertyOf owl:topObjectProperty ;
+                 owl:inverseOf :predava .
+
+
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan
+:jeVpisan rdf:type owl:ObjectProperty ;
+          rdfs:subPropertyOf owl:topObjectProperty ;
+          rdf:type owl:FunctionalProperty ,
+                   owl:AsymmetricProperty ;
+          rdfs:domain :Študent ;
+          rdfs:range :Letnik .
+
+
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeČlanica
+:jeČlanica rdf:type owl:ObjectProperty ;
            rdfs:subPropertyOf owl:topObjectProperty ;
-           rdf:type owl:AsymmetricProperty ;
-           rdfs:domain :Študent ;
-           rdfs:range :Predmet .
-
-
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#je_članica
-:je_članica rdf:type owl:ObjectProperty ;
-            rdfs:subPropertyOf owl:topObjectProperty ;
-            rdfs:domain :Fakulteta ;
-            rdfs:range :Univerza .
+           rdf:type owl:ReflexiveProperty ;
+           rdfs:domain :Fakulteta ;
+           rdfs:range :Univerza .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje
 :obiskuje rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf owl:topObjectProperty ;
+          rdf:type owl:AsymmetricProperty ;
           rdfs:domain :Študent ;
-          rdfs:range :Letnik .
+          rdfs:range :Predmet .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava
@@ -43,22 +52,22 @@
          rdfs:range :Predmet .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#se_izvaja
-:se_izvaja rdf:type owl:ObjectProperty ;
-           rdfs:subPropertyOf owl:topObjectProperty ;
-           rdfs:domain :Študij ;
-           rdfs:range :Fakulteta ,
-                      :Univerza .
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja
+:seIzvaja rdf:type owl:ObjectProperty ;
+          rdfs:subPropertyOf owl:topObjectProperty ;
+          rdfs:domain :Študij ;
+          rdfs:range :Fakulteta .
 
 
 #################################################################
 #    Data properties
 #################################################################
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#vpisna_številka
-:vpisna_številka rdf:type owl:DatatypeProperty ;
-                 rdfs:domain :Študent ;
-                 rdfs:range xsd:integer .
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisnoŠtevilko
+:imaVpisnoŠtevilko rdf:type owl:DatatypeProperty ;
+                   rdfs:subPropertyOf owl:topDataProperty ;
+                   rdfs:domain :Študent ;
+                   rdfs:range xsd:integer .
 
 
 #################################################################
@@ -115,15 +124,6 @@
 #    Individuals
 #################################################################
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Domen_Novak
-:Domen_Novak rdf:type owl:NamedIndividual ,
-                      :Študent ;
-             :je_vpisan :Fakulteta_za_računalništvo_in_informatiko ;
-             :obiskuje :Fakulteta_za_računalništvo_in_informatiko ;
-             :vpisna_številka 63199999 ;
-             rdfs:comment "Je študent fakultete za računalništvo in informatiko v Ljubljani" .
-
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Drugi_Letnik
 :Drugi_Letnik rdf:type owl:NamedIndividual ,
                        :Letnik .
@@ -132,21 +132,26 @@
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta_za_računalništvo_in_informatiko
 :Fakulteta_za_računalništvo_in_informatiko rdf:type owl:NamedIndividual ,
                                                     :Fakulteta ;
-                                           :je_članica :Univerza_v_Ljubljani ;
-                                           :obiskuje :Obdelava_naravnega_jezika .
+                                           :jeČlanica :Univerza_v_Ljubljani .
+
+
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Franc_Horvat
+:Franc_Horvat rdf:type owl:NamedIndividual ,
+                       :Profesor ;
+              :predava :Obdelava_naravnega_jezika .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Janez_Novak
 :Janez_Novak rdf:type owl:NamedIndividual ,
-                      :Profesor ;
-             :predava :Obdelava_naravnega_jezika .
+                      :Študent ;
+             :jeVpisan :Drugi_Letnik ;
+             :obiskuje :Obdelava_naravnega_jezika ;
+             :imaVpisnoŠtevilko 63199999 .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Obdelava_naravnega_jezika
 :Obdelava_naravnega_jezika rdf:type owl:NamedIndividual ,
-                                    :Predmet ;
-                           :obiskuje :Obdelava_naravnega_jezika ;
-                           :se_izvaja :Fakulteta_za_računalništvo_in_informatiko .
+                                    :Predmet .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Prvi_letnik
@@ -167,17 +172,15 @@
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(UNI)
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(UNI)> rdf:type owl:NamedIndividual ,
                                                                                                                :Dodiplomski ,
-                                                                                                               :Podiplomski ,
-                                                                                                               :Študij ;
-                                                                                                      :se_izvaja :Fakulteta_za_računalništvo_in_informatiko .
+                                                                                                               :Podiplomski ;
+                                                                                                      :seIzvaja :Fakulteta_za_računalništvo_in_informatiko .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(VS)
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(VS)> rdf:type owl:NamedIndividual ,
                                                                                                               :Dodiplomski ,
-                                                                                                              :Podiplomski ,
-                                                                                                              :Študij ;
-                                                                                                     :se_izvaja :Fakulteta_za_računalništvo_in_informatiko .
+                                                                                                              :Podiplomski ;
+                                                                                                     :seIzvaja :Fakulteta_za_računalništvo_in_informatiko .
 
 
 ###  Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi
