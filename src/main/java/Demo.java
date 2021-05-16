@@ -6,7 +6,6 @@ import java.util.HashMap;
 // TODO: check if rbox is required, handle rBox in model
 // TODO: prepare .ru sparql queries/showcase for toy ontology and dbpedia
 // TODO: demonstrate consistency checking, improve efficiency of checking for consistency for large datasets
-// TODO: Intercept SPARQL queries and call appropriate methods
 
 // TODO: remove duplicate code...
 // TODO: Improve error handling
@@ -100,42 +99,15 @@ public class Demo {
 
     public static void loadABoxToBoxToJenaAndPerformSPARQLOperations(String aBoxFullPath, String tBoxFullPath, ArrayList<String> SPARQLQueries) {
 
-        String SPARQLSelectLocation = null;
-        String SPARQLInsertLocation = null;
-        String SPARQLDeleteLocation = null;
-        String SPARQLUpdateLocation = null;
-        if (SPARQLQueries.size() < 4) {
-            System.out.println("For this demo you must specify select");
-            return;
-        }
-        for(String query : SPARQLQueries) {
-            if (query.contains("select")) {
-                SPARQLSelectLocation = query;
-            }
-            if (query.contains("insert")) {
-                SPARQLInsertLocation = query;
-            }
-            if (query.contains("update")) {
-                SPARQLUpdateLocation = query;
-            }
-            if (query.contains("delete")) {
-                SPARQLDeleteLocation = query;
-            }
-        }
 
         JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath);
 //        JenaHelpers jenaHelpers = new JenaHelpers(inputDBPediaTBoxFullPath, inputDBPediaABoxFullPath);
-        System.out.println("SELECT --------------------------------------------------------------------------------------------");
-        jenaHelpers.executeSPARQLQuery(SPARQLSelectLocation);
-        System.out.println("INSERT --------------------------------------------------------------------------------------------");
-        jenaHelpers.executeSPARQLInsert(SPARQLInsertLocation);
-        jenaHelpers.printDatasetToStandardOutput();
-        System.out.println("DELETE --------------------------------------------------------------------------------------------");
-        jenaHelpers.executeSPARQLDelete(SPARQLDeleteLocation);
-        jenaHelpers.printDatasetToStandardOutput();
-        System.out.println("UPDATE--------------------------------------------------------------------------------------------");
-        jenaHelpers.executeSPARQLUpdate(SPARQLUpdateLocation);
-        jenaHelpers.printDatasetToStandardOutput();
+
+        for(String query : SPARQLQueries) {
+            System.out.println("[Executing SPARQL from file] "+query);
+            jenaHelpers.executeSPARQL(query);
+//            jenaHelpers.printDatasetToStandardOutput();
+        }
     }
 
 }

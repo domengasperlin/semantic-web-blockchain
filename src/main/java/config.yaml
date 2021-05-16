@@ -11,8 +11,8 @@ ontology:
   SPARQLQueries:
     - rdf-sparql/input/select.ru
     - rdf-sparql/input/insert.ru
-    - rdf-sparql/input/update.ru
     - rdf-sparql/input/delete.ru
+    - rdf-sparql/input/update.ru
 IPFS:
   nodeAddress: /ip4/127.0.0.1/tcp/5001
 ethereum:

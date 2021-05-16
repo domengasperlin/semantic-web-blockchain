@@ -13,7 +13,10 @@ import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.util.FileManager;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
+import java.util.Scanner;
 
 public class JenaHelpers {
     Model model;
@@ -68,36 +71,47 @@ public class JenaHelpers {
         this.model = this.tBoxSchema.add(this.aBoxFacts);
     }
 
-    public void executeSPARQLQuery(String SPARQLSelectLocation) {
-        Query query = QueryFactory.read(SPARQLSelectLocation);
-        QueryExecution qexec = QueryExecutionFactory.create(query, model);
+    public void executeSPARQL(String SPARQLQueryFileLocation) {
+        File file = new File(SPARQLQueryFileLocation);
+        Boolean executeSelect = false;
         try {
-            ResultSet results = qexec.execSelect();
-            while ( results.hasNext() ) {
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                if (line.toLowerCase().contains("select")) {
+                    executeSelect = true;
+                    break;
+                }
+            }
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (executeSelect) {
+            executeSPARQLSelectQuery(SPARQLQueryFileLocation);
+        } else {
+            executeSPARQLUpdateAction(SPARQLQueryFileLocation);
+        }
+
+    }
+
+    private void executeSPARQLSelectQuery(String SPARQLSelectLocation) {
+        Query query = QueryFactory.read(SPARQLSelectLocation);
+        QueryExecution queryExec = QueryExecutionFactory.create(query, model);
+        try {
+            ResultSet results = queryExec.execSelect();
+            while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 System.out.println(soln);
             }
         } finally {
-            qexec.close();
+            queryExec.close();
         }
     }
 
-    public void executeSPARQLInsert(String SPARQLInsertLocation) {
+    private void executeSPARQLUpdateAction(String LocationOfSPARQL) {
         UpdateRequest request = UpdateFactory.create() ;
-        UpdateAction.readExecute(SPARQLInsertLocation, model) ;
-        UpdateAction.execute(request, model) ;
-    }
-
-    public void executeSPARQLUpdate(String SPARQLUpdateLocation) {
-        UpdateRequest request = UpdateFactory.create() ;
-        UpdateAction.readExecute(SPARQLUpdateLocation, model) ;
-        UpdateAction.execute(request, model) ;
-    }
-
-    public void executeSPARQLDelete(String SPARQLDeleteLocation) {
-        UpdateRequest request = UpdateFactory.create() ;
-        UpdateAction.readExecute(SPARQLDeleteLocation, model) ;
-        UpdateAction.execute(request, model) ;
+        UpdateAction.readExecute(LocationOfSPARQL, model) ;
+        UpdateAction.execute(request, model);
     }
 
     public void printDatasetToStandardOutput() {
