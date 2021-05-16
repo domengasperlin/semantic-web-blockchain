@@ -1,14 +1,14 @@
 import io.ipfs.api.IPFS;
-import org.web3j.crypto.Credentials;
-import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-// TODO: demonstrate inconsistencies, improve efficiency of checking for consistency for large datasets
 // TODO: check if rbox is required, handle rBox in model
-// Remove duplicate code...
-// Fix error in web3:generate sources and build new smart contracts
+// TODO: prepare .ru sparql queries/showcase for toy ontology and dbpedia
+// TODO: demonstrate consistency checking, improve efficiency of checking for consistency for large datasets
+// TODO: extend localDataSchemaSplitAndSaveToFile to load all files from yaml
+// TODO: remove duplicate code...
+// TODO: Improve error handling
 public class Demo {
     public static ConfigLoader configLoader;
     public static ArrayList<String> loadFromFiles;
@@ -16,9 +16,7 @@ public class Demo {
     public static ArrayList<String> SPARQLQueries;
 
     public static String IPFSNodeAddress;
-    public static String ethereumWalletLocation;
     public static String ethereumNodeAddress;
-    public static String ethereumWalletPassword;
 
     public static void main(String[] args) {
         // Init
@@ -28,11 +26,12 @@ public class Demo {
         dumpToFiles = (ArrayList<LinkedHashMap<String, String>>)configLoader.getOntology().get("dumpToFiles");
         SPARQLQueries = (ArrayList<String>)configLoader.getOntology().get("SPARQLQueries");
         IPFSNodeAddress = (String)configLoader.getIPFS().get("nodeAddress");
-        ethereumWalletLocation = (String)configLoader.getEthereum().get("walletPath");
         ethereumNodeAddress = (String)configLoader.getEthereum().get("nodeAddress");
-        ethereumWalletPassword = (String)configLoader.getEthereum().get("walletPassword");
 
         IPFSHelpers ipfs = new IPFSHelpers(new IPFS(IPFSNodeAddress));
+
+        Web3Helpers web3Helpers = new Web3Helpers(ethereumNodeAddress, configLoader.isDevelopment());
+        web3Helpers.loadCredentials(configLoader);
 
         String aBoxFullPath = null;
         String tBoxFullPath = null;
@@ -59,10 +58,11 @@ public class Demo {
         String aBoxCID = ipfs.uploadLocalFile(aBoxFullPath).toString();
         String tBoxCID = ipfs.uploadLocalFile(tBoxFullPath).toString();
         System.out.println("[IPFS upload] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID);
+
         // Store schema and data CIDs to Ethereum
-        String contractAddress = storeDataOnEthereumAndGetContractAddress(tBoxCID, aBoxCID);
+        String contractAddress = storeDataOnEthereumAndGetContractAddress(web3Helpers, tBoxCID, aBoxCID);
         // Retrieve schema and data pointers from Ethereum
-        String[] ontology = retrieveIPFSHashesForSchemaAndDataFromEthereum(contractAddress);
+        String[] ontology = retrieveIPFSHashesForSchemaAndDataFromEthereum(web3Helpers, contractAddress);
         tBoxCID = ontology[0];
         aBoxCID = ontology[1];
 
@@ -71,49 +71,24 @@ public class Demo {
         // Download data from IPFS
         downloadDataDownstream(ipfs, aBoxCID, tBoxCID);
         System.out.println("[Load files to triplestore and run SPARQL] ");
-        // TODO: Update showcase for the new demo ontology
         // Load the schema and data files into the Apache Jena
         showcaseJenaSPARQLOperations();
     }
 
-    public static String storeDataOnEthereumAndGetContractAddress(String tBoxCID, String aBoxCID) {
-        Credentials credentials = null;
-
-        if (configLoader.isDevelopment()) {
-            // Demo Ganache account
-            String privateKey= "97b3900860ef91192f7cdfe3a9268bd2e9c6a245994d513297dcf7e0a1d55d32";
-            credentials = Credentials.create(privateKey);
-        } else {
-            try {
-                credentials = WalletUtils.loadCredentials(ethereumWalletPassword, ethereumWalletLocation);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        WebHelpers webHelpers = new WebHelpers(ethereumNodeAddress, credentials);
-        String contractAddress = webHelpers.deployStorageContract();
-        TransactionReceipt storeTransactionReceipt = webHelpers.loadStorageContractAndCallStoreMethod(contractAddress, tBoxCID, aBoxCID);
+    public static String storeDataOnEthereumAndGetContractAddress(Web3Helpers web3Helpers, String tBoxCID, String aBoxCID) {
+        String contractAddress = web3Helpers.deployStorageContract();
+        TransactionReceipt storeTransactionReceipt = web3Helpers.loadStorageContractAndCallStoreMethod(contractAddress, tBoxCID, aBoxCID);
         String storeTransactionHash = storeTransactionReceipt.getTransactionHash();
         System.out.println("Store data transaction: "+storeTransactionHash);
         return contractAddress;
     }
 
-    public static String[] retrieveIPFSHashesForSchemaAndDataFromEthereum(String contractAddress) {
-        Credentials credentials = null;
-        try {
-            credentials = WalletUtils.loadCredentials(ethereumWalletPassword, ethereumWalletLocation);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        WebHelpers webHelpers = new WebHelpers(ethereumNodeAddress, credentials);
-        String[] contractCIDs = webHelpers.loadStorageContractAndCallRetrieveMethod(contractAddress);
+    public static String[] retrieveIPFSHashesForSchemaAndDataFromEthereum(Web3Helpers web3Helpers, String contractAddress) {
+        String[] contractCIDs = web3Helpers.loadStorageContractAndCallRetrieveMethod(contractAddress);
         return contractCIDs;
     }
 
     public static OntologyHelpers localDataSchemaSplitAndSaveToFile(String aBoxFullPath, String tBoxFullPath) {
-//      TODO: extend to load all files
         String inputOntologyFullPath = loadFromFiles.get(0);
         OntologyHelpers ontologyHelpers = new OntologyHelpers(inputOntologyFullPath);
         // Save to file and upload to IPFS

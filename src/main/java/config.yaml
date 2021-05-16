@@ -17,5 +17,6 @@ IPFS:
   nodeAddress: /ip4/127.0.0.1/tcp/5001
 ethereum:
   nodeAddress: http://localhost:7545 # https://rinkeby.infura.io/v3/18b69a4069f7455ba4486efd1f5530b1
-  walletPath: ethereum/wallet--c261cf8e7283030d0b6fa672b5d15819c8d99aa3
-  walletPassword: demo
+  walletPrivateKey: 97b3900860ef91192f7cdfe3a9268bd2e9c6a245994d513297dcf7e0a1d55d32
+#  walletPath: ethereum/wallet--c261cf8e7283030d0b6fa672b5d15819c8d99aa3
+#  walletPassword: demo

@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 public class JenaHelpers {
     Model model;
+    // TODO: handle this better, e.g. check if those folders already exist
     private static boolean doInitialLoad = true;
     private static String tBoxLocation = "target/tbox";
     private static String aBoxLocation = "target/abox";

@@ -1,5 +1,6 @@
 import contracts.Storage;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
@@ -8,21 +9,38 @@ import org.web3j.utils.Convert;
 
 import java.math.BigInteger;
 
-public class WebHelpers {
+public class Web3Helpers {
     Web3j web3;
     Credentials credentials;
     private BigInteger gasLimit;
     private BigInteger gasPrice;
-    public WebHelpers(String ethereumNodeAddress, Credentials credentials) {
+    public Web3Helpers(String ethereumNodeAddress, Boolean useGanacheSpecificGasPriceGasLimit) {
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
-        this.credentials = credentials;
-        if (ethereumNodeAddress.contains("localhost")) {
-            // ganache specific
+        if (useGanacheSpecificGasPriceGasLimit) {
             gasLimit = BigInteger.valueOf(6721975);
             gasPrice = Convert.toWei("20000000000", Convert.Unit.WEI).toBigInteger();
         } else {
             gasLimit = new DefaultGasProvider().getGasLimit();
             gasPrice = new DefaultGasProvider().getGasPrice();
+        }
+    }
+
+    public void loadCredentials(ConfigLoader configLoader) {
+        String ethereumWalletLocation = (String)configLoader.getEthereum().get("walletPath");
+        String ethereumWalletPassword = (String)configLoader.getEthereum().get("walletPassword");
+        String ethereumWalletPrivateKey = (String)configLoader.getEthereum().get("walletPrivateKey");
+
+        if (ethereumWalletPrivateKey != null) {
+            this.credentials = Credentials.create(ethereumWalletPrivateKey);
+        }
+        else if (ethereumWalletLocation != null) {
+            try {
+                this.credentials = WalletUtils.loadCredentials(ethereumWalletPassword, ethereumWalletLocation);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Error fetching a wallet!");
         }
     }
 
