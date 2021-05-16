@@ -27,7 +27,6 @@ public class OntologyHelpers {
         }
         this.ontologies = manager.getOntologies();
 
-
 //        StructuralReasonerFactory factory = new StructuralReasonerFactory();
 //        OWLReasoner reasoner = factory.createReasoner(ontology);
 //        engine = QueryEngine.create(manager, reasoner, true);

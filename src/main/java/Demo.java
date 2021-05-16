@@ -2,11 +2,11 @@ import io.ipfs.api.IPFS;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 // TODO: check if rbox is required, handle rBox in model
 // TODO: prepare .ru sparql queries/showcase for toy ontology and dbpedia
 // TODO: demonstrate consistency checking, improve efficiency of checking for consistency for large datasets
+// TODO: Intercept SPARQL queries and call appropriate methods
 
 // TODO: remove duplicate code...
 // TODO: Improve error handling
@@ -48,7 +48,7 @@ public class Demo {
         downloadDataDownstream(ipfsHelpers, aBoxCID, tBoxCID, aBoxFullPath, tBoxFullPath);
         System.out.println("[Load files to triplestore and run SPARQL] ");
         // Load the schema and data files into the Apache Jena
-        showcaseJenaSPARQLOperations(SPARQLQueries, aBoxFullPath, tBoxFullPath);
+        loadABoxToBoxToJenaAndPerformSPARQLOperations(aBoxFullPath, tBoxFullPath, SPARQLQueries);
     }
 
     public static String storeDataOnEthereumAndGetContractAddress(Web3Helpers web3Helpers, String tBoxCID, String aBoxCID) {
@@ -98,7 +98,7 @@ public class Demo {
         ipfsHelpers.retrieveFileAndSaveItToLocalSystem(tBoxFileHash, tBoxFullPath);
     }
 
-    public static void showcaseJenaSPARQLOperations(ArrayList<String> SPARQLQueries, String aBoxFullPath, String tBoxFullPath) {
+    public static void loadABoxToBoxToJenaAndPerformSPARQLOperations(String aBoxFullPath, String tBoxFullPath, ArrayList<String> SPARQLQueries) {
 
         String SPARQLSelectLocation = null;
         String SPARQLInsertLocation = null;
