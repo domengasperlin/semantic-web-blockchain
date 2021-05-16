@@ -5,25 +5,37 @@ import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Set;
 
 public class OntologyHelpers {
-    public OWLOntology ontology;
+    private OWLOntology ontology;
 
-    public OntologyHelpers(String fileName) {
-        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-        try {
-            ontology = manager.loadOntologyFromOntologyDocument(new File(fileName));
-        } catch (OWLOntologyCreationException e) {
-            e.printStackTrace();
+    public OntologyHelpers(ArrayList<String> filesToLoad) {
+        if (filesToLoad.size() < 1) {
+            System.out.println("Must have at least 1 input ontology");
+            return;
         }
+        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+        for (String fileName : filesToLoad) {
+            try {
+                manager.loadOntologyFromOntologyDocument(new File(fileName));
+            } catch (OWLOntologyCreationException e) {
+                e.printStackTrace();
+            }
+        }
+        Set<OWLOntology> ontologies = manager.getOntologies();
+
+        Iterator iter = ontologies.iterator();
+        if (iter.hasNext()) {
+            ontology = (OWLOntology)iter.next();
+        }
+
+
 //        StructuralReasonerFactory factory = new StructuralReasonerFactory();
 //        OWLReasoner reasoner = factory.createReasoner(ontology);
 //        engine = QueryEngine.create(manager, reasoner, true);
-    }
-
-    public OWLOntology getOntology() {
-        return ontology;
     }
 
     public OWLDocumentFormat chooseCorrectFormat(String fileName) {
