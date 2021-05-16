@@ -1,4 +1,6 @@
 import io.ipfs.api.IPFS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +12,7 @@ import java.util.HashMap;
 // TODO: remove duplicate code...
 // TODO: Improve error handling
 public class Demo {
-
+    private static final Logger log = LoggerFactory.getLogger(Demo.class);
     public static void main(String[] args) {
         ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
         ArrayList<String> loadFromFiles = (ArrayList<String>)configLoader.getOntology().get("loadFromFiles");
@@ -32,7 +34,7 @@ public class Demo {
         // Upload schema and data files to IPFS
         String aBoxCID = ipfsHelpers.uploadLocalFile(aBoxFullPath).toString();
         String tBoxCID = ipfsHelpers.uploadLocalFile(tBoxFullPath).toString();
-        System.out.println("[IPFS upload] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID);
+        log.info("[IPFS upload] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID);
 
         // Store schema and data CIDs to Ethereum
         String contractAddress = storeDataOnEthereumAndGetContractAddress(web3Helpers, tBoxCID, aBoxCID);
@@ -41,11 +43,11 @@ public class Demo {
         tBoxCID = ontology[0];
         aBoxCID = ontology[1];
 
-        System.out.println("[ETH retrieve] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID);
-        System.out.println("[IPFS download and write to files] ");
+        log.info("[ETH retrieve] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID);
+        log.info("[IPFS download and write to files] ");
         // Download data from IPFS
         downloadDataDownstream(ipfsHelpers, aBoxCID, tBoxCID, aBoxFullPath, tBoxFullPath);
-        System.out.println("[Load files to triplestore and run SPARQL] ");
+        log.info("[Load files to triplestore and run SPARQL] ");
         // Load the schema and data files into the Apache Jena
         loadABoxToBoxToJenaAndPerformSPARQLOperations(aBoxFullPath, tBoxFullPath, SPARQLQueries);
     }
@@ -54,7 +56,7 @@ public class Demo {
         String contractAddress = web3Helpers.deployStorageContract();
         TransactionReceipt storeTransactionReceipt = web3Helpers.loadStorageContractAndCallStoreMethod(contractAddress, tBoxCID, aBoxCID);
         String storeTransactionHash = storeTransactionReceipt.getTransactionHash();
-        System.out.println("Store data transaction: "+storeTransactionHash);
+        log.info("Store data transaction: "+storeTransactionHash);
         return contractAddress;
     }
 
@@ -78,7 +80,7 @@ public class Demo {
             }
         }
 
-        System.out.println("Dump files must contain rbox, abox, tbox files");
+        log.error("Dump files must contain rbox, abox, tbox files");
         return null;
     }
 
@@ -88,7 +90,7 @@ public class Demo {
                 return el.get("tbox");
             }
         }
-        System.out.println("Dump files must contain rbox, abox, tbox files");
+        log.error("Dump files must contain rbox, abox, tbox files");
         return null;
     }
 
@@ -104,7 +106,7 @@ public class Demo {
 //        JenaHelpers jenaHelpers = new JenaHelpers(inputDBPediaTBoxFullPath, inputDBPediaABoxFullPath);
 
         for(String query : SPARQLQueries) {
-            System.out.println("[Executing SPARQL from file] "+query);
+            log.info("[Executing SPARQL from file] "+query);
             jenaHelpers.executeSPARQL(query);
 //            jenaHelpers.printDatasetToStandardOutput();
         }

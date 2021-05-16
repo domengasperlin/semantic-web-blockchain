@@ -12,6 +12,8 @@ import org.apache.jena.update.UpdateAction;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.util.FileManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,6 +28,7 @@ public class JenaHelpers {
     private static String aBoxLocation = "target/abox";
     Model tBoxSchema;
     Model aBoxFacts;
+    private static final Logger log = LoggerFactory.getLogger(JenaHelpers.class);
     public JenaHelpers(String tBoxFileName, String aBoxFileName) {
         FileManager fm = FileManager.get();
 
@@ -59,14 +62,14 @@ public class JenaHelpers {
 
         // My idea is perform operation with commit and then check consisentency if not consistent rollback the operation
         if ( !validityReport.isValid() ) {
-            System.out.println("Ontology is not consistent");
+            log.warn("Ontology is not consistent");
             Iterator<ValidityReport.Report> iter = validityReport.getReports();
             while ( iter.hasNext() ) {
                 ValidityReport.Report report = iter.next();
-                System.out.println(report);
+                log.info(report.toString());
             }
         } else {
-            System.out.println("Ontology is consistent");
+            log.info("Ontology is consistent");
         }
         this.model = this.tBoxSchema.add(this.aBoxFacts);
     }
@@ -101,7 +104,7 @@ public class JenaHelpers {
             ResultSet results = queryExec.execSelect();
             while (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
-                System.out.println(soln);
+                log.info(soln.toString());
             }
         } finally {
             queryExec.close();

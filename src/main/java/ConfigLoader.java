@@ -1,3 +1,5 @@
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -8,13 +10,14 @@ import java.util.Map;
 
 public class ConfigLoader {
     Map<String, Object> data;
+    private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
     public ConfigLoader(String path) {
         try {
             InputStream inputStream = new FileInputStream(new File(path));
             Yaml yaml = new Yaml();
             data = yaml.load(inputStream);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 

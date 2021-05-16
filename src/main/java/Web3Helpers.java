@@ -1,4 +1,6 @@
 import contracts.Storage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
@@ -14,6 +16,7 @@ public class Web3Helpers {
     Credentials credentials;
     private BigInteger gasLimit;
     private BigInteger gasPrice;
+    private static final Logger log = LoggerFactory.getLogger(Web3Helpers.class);
     public Web3Helpers(String ethereumNodeAddress, Boolean useGanacheSpecificGasPriceGasLimit) {
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
         if (useGanacheSpecificGasPriceGasLimit) {
@@ -40,7 +43,7 @@ public class Web3Helpers {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Error fetching a wallet!");
+            log.error("Error fetching a wallet!");
         }
     }
 
