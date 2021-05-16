@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 // TODO: check if rbox is required, handle rBox in model
 // TODO: prepare .ru sparql queries/showcase for toy ontology and dbpedia
 // TODO: demonstrate consistency checking, improve efficiency of checking for consistency for large datasets
-// TODO: extend localDataSchemaSplitAndSaveToFile to load all files from yaml
 
 // TODO: remove duplicate code...
 // TODO: Improve error handling
