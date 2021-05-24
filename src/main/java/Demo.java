@@ -8,6 +8,7 @@ import java.util.HashMap;
 // TODO: check if rbox is required, handle rBox in model
 // TODO: prepare .ru sparql queries/showcase for toy ontology and dbpedia
 // TODO: demonstrate consistency checking, improve efficiency of checking for consistency for large datasets
+// TODO: fix out of RAM when spliting ontologies exception to TBox, ABox - maybe the solution could be reading part of file / loading part of file and dumping it as we go
 
 // TODO: remove duplicate code...
 // TODO: Improve error handling
