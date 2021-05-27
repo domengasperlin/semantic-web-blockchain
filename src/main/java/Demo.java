@@ -17,53 +17,51 @@ public class Demo {
     private static final Logger log = LoggerFactory.getLogger(Demo.class);
     public static void main(String[] args) {
         ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
-        ArrayList<String> loadFromFiles = (ArrayList<String>)configLoader.getOntology().get("loadFromFiles");
-        ArrayList<HashMap<String, String>> dumpToFiles = (ArrayList<HashMap<String, String>>)configLoader.getOntology().get("dumpToFiles");
+        ArrayList<String> loadOntologyFromFiles = (ArrayList<String>)configLoader.getOntology().get("loadFromFiles");
+        ArrayList<HashMap<String, String>> splitOntologyToSchemaDataFiles = (ArrayList<HashMap<String, String>>)configLoader.getOntology().get("dumpToFiles");
         String IPFSNodeAddress = (String)configLoader.getIPFS().get("nodeAddress");
         String ethereumNodeAddress = (String)configLoader.getEthereum().get("nodeAddress");
         ArrayList<String> SPARQLQueries = (ArrayList<String>)configLoader.getOntology().get("SPARQLQueries");
 
-        IPFSHelpers ipfsHelpers = new IPFSHelpers(new IPFS(IPFSNodeAddress));
-
-        Web3Helpers web3Helpers = new Web3Helpers(ethereumNodeAddress, configLoader.isDevelopment());
-        web3Helpers.loadCredentials(configLoader);
-
-        String aBoxFullPath = getABoxFilePath(dumpToFiles);
-        String tBoxFullPath = getTBoxFilePath(dumpToFiles);
-
         // Separate schema and data
-        OntologyHelpers ontologyHelpers = localDataSchemaSplitAndSaveToFile(loadFromFiles, aBoxFullPath, tBoxFullPath);
+        String aBoxFullPath = getABoxFilePath(splitOntologyToSchemaDataFiles);
+        String tBoxFullPath = getTBoxFilePath(splitOntologyToSchemaDataFiles);
+        OntologyHelpers ontologyHelpers = localDataSchemaSplitAndSaveToFile(loadOntologyFromFiles, aBoxFullPath, tBoxFullPath);
+
         // Upload schema and data files to IPFS
-        String aBoxCID = ipfsHelpers.uploadLocalFile(aBoxFullPath).toString();
-        String tBoxCID = ipfsHelpers.uploadLocalFile(tBoxFullPath).toString();
+        IPFSHelpers ipfsHelpers = new IPFSHelpers(new IPFS(IPFSNodeAddress));
+        String aBoxCID = ipfsHelpers.uploadLocalFileToIPFS(aBoxFullPath).toString();
+        String tBoxCID = ipfsHelpers.uploadLocalFileToIPFS(tBoxFullPath).toString();
         log.info("[IPFS upload] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID);
 
         // Store schema and data CIDs to Ethereum
-        String contractAddress = storeDataOnEthereumAndGetContractAddress(web3Helpers, tBoxCID, aBoxCID);
+        EthereumHelpers ethereumHelpers = new EthereumHelpers(ethereumNodeAddress, configLoader.isDevelopment());
+        ethereumHelpers.loadWalletCredentials(configLoader);
+        String contractAddress = storeDataIdentifiersOnEthereumAndGetContractAddress(ethereumHelpers, tBoxCID, aBoxCID);
         // Retrieve schema and data pointers from Ethereum
-        String[] ontology = retrieveIPFSHashesForSchemaAndDataFromEthereum(web3Helpers, contractAddress);
+        String[] ontology = retrieveIPFSHashesForSchemaAndDataFromEthereum(ethereumHelpers, contractAddress);
         tBoxCID = ontology[0];
         aBoxCID = ontology[1];
 
         log.info("[ETH retrieve] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID);
         log.info("[IPFS download and write to files] ");
-        // Download data from IPFS
+        // Download data from IPFS to local files
         downloadDataDownstream(ipfsHelpers, aBoxCID, tBoxCID, aBoxFullPath, tBoxFullPath);
         log.info("[Load files to triplestore and run SPARQL] ");
         // Load the schema and data files into the Apache Jena
         loadABoxToBoxToJenaAndPerformSPARQLOperations(aBoxFullPath, tBoxFullPath, SPARQLQueries);
     }
 
-    public static String storeDataOnEthereumAndGetContractAddress(Web3Helpers web3Helpers, String tBoxCID, String aBoxCID) {
-        String contractAddress = web3Helpers.deployStorageContract();
-        TransactionReceipt storeTransactionReceipt = web3Helpers.loadStorageContractAndCallStoreMethod(contractAddress, tBoxCID, aBoxCID);
+    public static String storeDataIdentifiersOnEthereumAndGetContractAddress(EthereumHelpers ethereumHelpers, String tBoxCID, String aBoxCID) {
+        String contractAddress = ethereumHelpers.deployStorageContract();
+        TransactionReceipt storeTransactionReceipt = ethereumHelpers.loadStorageContractAndCallStoreMethod(contractAddress, tBoxCID, aBoxCID);
         String storeTransactionHash = storeTransactionReceipt.getTransactionHash();
         log.info("Store data transaction: "+storeTransactionHash);
         return contractAddress;
     }
 
-    public static String[] retrieveIPFSHashesForSchemaAndDataFromEthereum(Web3Helpers web3Helpers, String contractAddress) {
-        String[] contractCIDs = web3Helpers.loadStorageContractAndCallRetrieveMethod(contractAddress);
+    public static String[] retrieveIPFSHashesForSchemaAndDataFromEthereum(EthereumHelpers ethereumHelpers, String contractAddress) {
+        String[] contractCIDs = ethereumHelpers.loadStorageContractAndCallRetrieveMethod(contractAddress);
         return contractCIDs;
     }
 
@@ -102,8 +100,6 @@ public class Demo {
     }
 
     public static void loadABoxToBoxToJenaAndPerformSPARQLOperations(String aBoxFullPath, String tBoxFullPath, ArrayList<String> SPARQLQueries) {
-
-
         JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath);
 //        JenaHelpers jenaHelpers = new JenaHelpers(inputDBPediaTBoxFullPath, inputDBPediaABoxFullPath);
 

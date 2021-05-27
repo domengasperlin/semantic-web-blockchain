@@ -11,13 +11,13 @@ import org.web3j.utils.Convert;
 
 import java.math.BigInteger;
 
-public class Web3Helpers {
+public class EthereumHelpers {
     Web3j web3;
     Credentials credentials;
     private BigInteger gasLimit;
     private BigInteger gasPrice;
-    private static final Logger log = LoggerFactory.getLogger(Web3Helpers.class);
-    public Web3Helpers(String ethereumNodeAddress, Boolean useGanacheSpecificGasPriceGasLimit) {
+    private static final Logger log = LoggerFactory.getLogger(EthereumHelpers.class);
+    public EthereumHelpers(String ethereumNodeAddress, Boolean useGanacheSpecificGasPriceGasLimit) {
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
         if (useGanacheSpecificGasPriceGasLimit) {
             gasLimit = BigInteger.valueOf(6721975);
@@ -28,7 +28,7 @@ public class Web3Helpers {
         }
     }
 
-    public void loadCredentials(ConfigLoader configLoader) {
+    public void loadWalletCredentials(ConfigLoader configLoader) {
         String ethereumWalletLocation = (String)configLoader.getEthereum().get("walletPath");
         String ethereumWalletPassword = (String)configLoader.getEthereum().get("walletPassword");
         String ethereumWalletPrivateKey = (String)configLoader.getEthereum().get("walletPrivateKey");
