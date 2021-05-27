@@ -1,6 +1,16 @@
-PREFIX dc: <http://purl.org/dc/elements/1.1/>
+prefix : <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#>
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix xml: <http://www.w3.org/XML/1998/namespace>
+prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 INSERT DATA
 {
-  <http://example/book> dc:title "book" ;
-                         dc:creator "Creator" .
+  :Predmet rdf:type owl:Class ;
+           rdfs:subClassOf :Modul .
 }
+# Demo adding inconsistent data to ontology
+# INSERT DATA
+# {
+#  :Janez_Novak rdf:type :Profesor ;
+# }

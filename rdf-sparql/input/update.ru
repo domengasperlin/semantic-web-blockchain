@@ -1,4 +1,5 @@
-PREFIX dc: <http://purl.org/dc/elements/1.1/>
-DELETE { <http://example/book> dc:creator "Creator". }
-INSERT { <http://example/book> dc:creator "Inventor" . }
-WHERE {  <http://example/book> dc:creator "Creator". }
+# TODO:
+prefix : <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#>
+DELETE { :Janez_Novak :jeVpisan :Drugi_letnik . }
+INSERT { :Janez_Novak :jeVpisan :Tretji_letnik . }
+## WHERE {  :Janez_Novak :jeVpisan :Drugi_letnik . }
