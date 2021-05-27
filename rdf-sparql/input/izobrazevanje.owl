@@ -70,6 +70,13 @@
                    rdfs:range xsd:integer .
 
 
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeBruc
+:jeBruc rdf:type owl:DatatypeProperty ;
+        rdfs:subPropertyOf owl:topDataProperty ;
+        rdfs:domain :Študent ;
+        rdfs:range xsd:boolean .
+
+
 #################################################################
 #    Classes
 #################################################################
