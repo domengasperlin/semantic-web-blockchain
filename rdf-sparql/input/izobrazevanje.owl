@@ -85,13 +85,7 @@
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik
-:Letnik rdf:type owl:Class ;
-        owl:equivalentClass [ rdf:type owl:Class ;
-                              owl:oneOf ( :Drugi_Letnik
-                                          :Prvi_letnik
-                                          :Tretji_letnik
-                                        )
-                            ] .
+:Letnik rdf:type owl:Class .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski
