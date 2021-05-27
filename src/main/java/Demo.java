@@ -101,12 +101,14 @@ public class Demo {
 
     public static void loadABoxToBoxToJenaAndPerformSPARQLOperations(String aBoxFullPath, String tBoxFullPath, ArrayList<String> SPARQLQueries) {
         JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath);
+        jenaHelpers.checkConsistency();
 //        JenaHelpers jenaHelpers = new JenaHelpers(inputDBPediaTBoxFullPath, inputDBPediaABoxFullPath);
 
         for(String query : SPARQLQueries) {
             log.info("[Executing SPARQL from file] "+query);
             jenaHelpers.executeSPARQL(query);
-//            jenaHelpers.printDatasetToStandardOutput();
+            jenaHelpers.printDatasetToStandardOutput();
+            jenaHelpers.checkConsistency();
         }
     }
 

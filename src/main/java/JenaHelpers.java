@@ -54,6 +54,10 @@ public class JenaHelpers {
             this.aBoxFacts = dataset.getDefaultModel();
         }
 
+        this.model = this.tBoxSchema.add(this.aBoxFacts);
+    }
+
+    public Boolean checkConsistency() {
         // TODO: reasoner should be used when querying OWL ontology
         Reasoner reasoner = ReasonerRegistry.getOWLReasoner().bindSchema(this.tBoxSchema);
         InfModel infModel = ModelFactory.createInfModel(reasoner, this.aBoxFacts);
@@ -68,10 +72,11 @@ public class JenaHelpers {
                 ValidityReport.Report report = iter.next();
                 log.info(report.toString());
             }
+            return true;
         } else {
             log.info("Ontology is consistent");
+            return false;
         }
-        this.model = this.tBoxSchema.add(this.aBoxFacts);
     }
 
     public void executeSPARQL(String SPARQLQueryFileLocation) {
