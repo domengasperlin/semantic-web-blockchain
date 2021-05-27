@@ -14,7 +14,7 @@ public class IPFSHelpers {
     public IPFSHelpers(IPFS ipfs) {
         this.ipfs = ipfs;
     }
-    public Multihash uploadLocalFile(String fileName) {
+    public Multihash uploadLocalFileToIPFS(String fileName) {
         Multihash hash = null;
         try {
             NamedStreamable.FileWrapper file = new NamedStreamable.FileWrapper(new File(fileName));
