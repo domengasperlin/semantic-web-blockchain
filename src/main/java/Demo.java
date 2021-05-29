@@ -110,6 +110,9 @@ public class Demo {
             jenaHelpers.executeSPARQL(query);
             jenaHelpers.printDatasetToStandardOutput();
             jenaHelpers.checkConsistency();
+            // TODO: if jenaHelpers.checkConsistency()
+            //          persistChangesToTripleStore
+            //          sync changes to blockchain
         }
     }
 
