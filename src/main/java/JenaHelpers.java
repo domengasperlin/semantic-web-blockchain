@@ -7,6 +7,7 @@ import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.reasoner.ValidityReport;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.tdb.TDB;
 import org.apache.jena.tdb.TDBFactory;
 import org.apache.jena.update.UpdateAction;
 import org.apache.jena.update.UpdateFactory;
@@ -21,40 +22,30 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 public class JenaHelpers {
-    Model model;
-    // TODO: handle this better, e.g. check if those folders already exist
-    private static boolean doInitialLoad = true;
-    private static String tBoxLocation = "target/tbox";
-    private static String aBoxLocation = "target/abox";
-    Model tBoxSchema;
-    Model aBoxFacts;
+    private Model model;
+    private Model tBoxSchema;
+    private Model aBoxFacts;
+    private static String datasetLocation = "target/dataset";
+
     private static final Logger log = LoggerFactory.getLogger(JenaHelpers.class);
     public JenaHelpers(String tBoxFileName, String aBoxFileName) {
+        // https://jena.apache.org/documentation/tdb/datasets.html set default graph as union of named graphs, TODO: check this
+        TDB.getContext().set(TDB.symUnionDefaultGraph, true);
         FileManager fm = FileManager.get();
 
-        if (doInitialLoad) {
-            Dataset tBoxDataset = TDBFactory.createDataset(tBoxLocation);
-            tBoxDataset.begin(ReadWrite.WRITE);
-            this.tBoxSchema = fm.readModel(tBoxDataset.getDefaultModel(), tBoxFileName);
-            tBoxDataset.commit();
-            tBoxDataset.end();
-        } else {
-            Dataset dataset = TDBFactory.createDataset(tBoxLocation);
-            this.tBoxSchema = dataset.getDefaultModel();
+        Dataset dataset = TDBFactory.createDataset(datasetLocation);
+        dataset.begin(ReadWrite.WRITE);
+        if (!dataset.containsNamedModel("tbox")) {
+            fm.readModel(dataset.getNamedModel("tbox"), tBoxFileName);
         }
-
-        if (doInitialLoad) {
-            Dataset aBoxDataset = TDBFactory.createDataset(aBoxLocation);
-            aBoxDataset.begin(ReadWrite.WRITE);
-            this.aBoxFacts = fm.readModel(aBoxDataset.getDefaultModel(), aBoxFileName);
-            aBoxDataset.commit();
-            aBoxDataset.end();
-        } else {
-            Dataset dataset = TDBFactory.createDataset(aBoxLocation);
-            this.aBoxFacts = dataset.getDefaultModel();
+        if (!dataset.containsNamedModel("abox")) {
+            fm.readModel(dataset.getNamedModel("abox"), aBoxFileName);
         }
-
-        this.model = this.tBoxSchema.add(this.aBoxFacts);
+        this.tBoxSchema = dataset.getNamedModel("tbox");
+        this.aBoxFacts = dataset.getNamedModel("abox");
+        this.model = dataset.getNamedModel("urn:x-arq:UnionGraph");
+        dataset.commit();
+        dataset.end();
     }
 
     public Boolean checkConsistency() {
@@ -104,7 +95,7 @@ public class JenaHelpers {
 
     private void executeSPARQLSelectQuery(String SPARQLSelectLocation) {
         Query query = QueryFactory.read(SPARQLSelectLocation);
-        QueryExecution queryExec = QueryExecutionFactory.create(query, model);
+        QueryExecution queryExec = QueryExecutionFactory.create(query, this.model);
         try {
             ResultSet results = queryExec.execSelect();
             while (results.hasNext()) {
@@ -116,10 +107,11 @@ public class JenaHelpers {
         }
     }
 
+    // TODO: decide how you are going to split operations on abox, tbox. Can't do updates on UnionGraph
     private void executeSPARQLUpdateAction(String LocationOfSPARQL) {
         UpdateRequest request = UpdateFactory.create() ;
-        UpdateAction.readExecute(LocationOfSPARQL, model) ;
-        UpdateAction.execute(request, model);
+        UpdateAction.readExecute(LocationOfSPARQL, this.tBoxSchema) ;
+        UpdateAction.execute(request, this.tBoxSchema);
     }
 
     public void printDatasetToStandardOutput() {

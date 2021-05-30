@@ -32,7 +32,14 @@ In order to connect to other Ethereum node change ethereum/nodeAddress in config
 
 
 ### Loading rdf data into database quickly
-[tdbloader2](https://jena.apache.org/documentation/tdb/commands.html#installation)
+[tdbloader](https://jena.apache.org/documentation/tdb/commands.html#installation)
+Load toy ontology 
 ```bash
-./tdbloader2 --loc ./semantic-web-blockchain/target/dataset ./semantic-web-blockchain/rdf-sparql/input/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz
+tdbloader --graph=abox --loc ./target/dataset ./ipfs-files/output/abox-axioms.nt
+tdbloader --graph=tbox --loc ./target/dataset ./ipfs-files/output/tbox-axioms.nt
+```
+or subset of DBpedia
+```bash
+tdbloader --graph=abox --loc ./target/dataset ./rdf-sparql/input/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz 
+tdbloader --graph=tbox --loc ./target/dataset ./rdf-sparql/input/TBox_DBpedia_ontology_type=parsed.xml
 ```
