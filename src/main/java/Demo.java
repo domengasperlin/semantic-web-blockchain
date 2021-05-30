@@ -8,9 +8,9 @@ import java.util.HashMap;
 // TODO: check if rbox is required, handle rBox in model
 // TODO: prepare .ru sparql queries/showcase for toy ontology
 // TODO: prepare .ru sparql queries/showcase for dbpedia
-// TODO: demonstrate consistency checking, improve efficiency of checking for consistency for large datasets
+// TODO: improve efficiency of checking for consistency for large datasets
 // TODO: fix out of RAM when splitting ontologies exception to TBox, ABox - maybe the solution could be reading part of file / loading part of file and dumping it as we go
-// TODO: improve Etheruem smart contract to use less gas
+// TODO: improve Ethereum smart contract to use less gas
 
 // TODO: remove duplicate code...
 // TODO: Improve error handling
