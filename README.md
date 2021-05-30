@@ -29,4 +29,10 @@ In order to connect to other Ethereum node change ethereum/nodeAddress in config
 
 ### Run IPFS node
 [IPFS](https://ipfs.io/#install)
-## 
+
+
+### Loading rdf data into database quickly
+[tdbloader2](https://jena.apache.org/documentation/tdb/commands.html#installation)
+```bash
+./tdbloader2 --loc ./semantic-web-blockchain/target/dataset ./semantic-web-blockchain/rdf-sparql/input/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz
+```
