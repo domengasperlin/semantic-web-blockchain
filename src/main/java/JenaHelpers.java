@@ -1,5 +1,6 @@
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.listeners.ChangedListener;
+import org.apache.jena.rdf.listeners.StatementListener;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
@@ -21,47 +22,27 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
-class TBoxListener implements ModelChangedListener
-{
-    public void addedStatement( Statement s ) {
+class TBoxListener extends StatementListener {
+    @Override
+    public void addedStatement(Statement s) {
         System.out.println( "[TBox] >> added statement " + s );
     }
-    public void addedStatements( Statement [] statements ) {}
-    public void addedStatements( List statements ) {}
-    public void addedStatements( StmtIterator statements ) {}
-    public void addedStatements( Model m ) {}
-    public void removedStatement( Statement s ) {
-        System.out.println( "[TBox] >> removed statement " + s );
-    }
-    public void removedStatements( Statement [] statements ) {}
-    public void removedStatements( List statements ) {}
-    public void removedStatements( StmtIterator statements ) {}
-    public void removedStatements( Model m ) {}
-    @Override
-    public void notifyEvent(Model model, Object o) {
 
+    @Override
+    public void removedStatement(Statement s) {
+        System.out.println( "[TBox] >> removed statement " + s );
     }
 }
 
-class ABoxListener implements ModelChangedListener
-{
-    public void addedStatement( Statement s ) {
+class ABoxListener extends StatementListener {
+    @Override
+    public void addedStatement(Statement s) {
         System.out.println( "[ABox] >> added statement " + s );
     }
-    public void addedStatements( Statement [] statements ) {}
-    public void addedStatements( List statements ) {}
-    public void addedStatements( StmtIterator statements ) {}
-    public void addedStatements( Model m ) {}
-    public void removedStatement( Statement s ) {
-        System.out.println( "[ABox] >> removed statement " + s );
-    }
-    public void removedStatements( Statement [] statements ) {}
-    public void removedStatements( List statements ) {}
-    public void removedStatements( StmtIterator statements ) {}
-    public void removedStatements( Model m ) {}
-    @Override
-    public void notifyEvent(Model model, Object o) {
 
+    @Override
+    public void removedStatement(Statement s) {
+        System.out.println( "[ABox] >> removed statement " + s );
     }
 }
 
