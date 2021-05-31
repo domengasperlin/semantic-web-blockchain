@@ -138,9 +138,9 @@ public class JenaHelpers {
     }
 
     // TODO: decide how you are going to split operations on abox, tbox. Can't do updates on UnionGraph
-    private void executeSPARQLUpdateAction(String LocationOfSPARQL) {
+    private void executeSPARQLUpdateAction(String locationOfSPARQL) {
         UpdateRequest request = UpdateFactory.create() ;
-        UpdateAction.readExecute(LocationOfSPARQL, this.tBoxSchema) ;
+        UpdateAction.readExecute(locationOfSPARQL, this.tBoxSchema) ;
         UpdateAction.execute(request, this.tBoxSchema);
     }
 
