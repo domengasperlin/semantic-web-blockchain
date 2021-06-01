@@ -1,5 +1,4 @@
 import org.apache.jena.query.*;
-import org.apache.jena.rdf.listeners.ChangedListener;
 import org.apache.jena.rdf.listeners.StatementListener;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.reasoner.Reasoner;
@@ -15,11 +14,9 @@ import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.util.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Scanner;
 
 class TBoxListener extends StatementListener {
@@ -31,6 +28,18 @@ class TBoxListener extends StatementListener {
     @Override
     public void removedStatement(Statement s) {
         System.out.println( "[TBox] >> removed statement " + s );
+    }
+}
+
+class RBoxListener extends StatementListener {
+    @Override
+    public void addedStatement(Statement s) {
+        System.out.println( "[RBox] >> added statement " + s );
+    }
+
+    @Override
+    public void removedStatement(Statement s) {
+        System.out.println( "[RBox] >> removed statement " + s );
     }
 }
 
@@ -50,10 +59,11 @@ public class JenaHelpers {
     private Model model;
     private Model tBoxSchema;
     private Model aBoxFacts;
+    private Model rBoxProperties;
     private static String datasetLocation = "target/dataset";
 
     private static final Logger log = LoggerFactory.getLogger(JenaHelpers.class);
-    public JenaHelpers(String tBoxFileName, String aBoxFileName) {
+    public JenaHelpers(String tBoxFileName, String aBoxFileName, String rBoxFileName) {
         // https://jena.apache.org/documentation/tdb/datasets.html set default graph as union of named graphs, TODO: check this
         TDB.getContext().set(TDB.symUnionDefaultGraph, true);
         FileManager fm = FileManager.get();
@@ -66,13 +76,21 @@ public class JenaHelpers {
         if (!dataset.containsNamedModel("abox")) {
             fm.readModel(dataset.getNamedModel("abox"), aBoxFileName);
         }
+        if (!dataset.containsNamedModel("rbox")) {
+            fm.readModel(dataset.getNamedModel("rbox"), rBoxFileName);
+        }
         this.tBoxSchema = dataset.getNamedModel("tbox");
         ModelChangedListener tBoxChangedListener = new TBoxListener();
         this.tBoxSchema.register(tBoxChangedListener);
 
+        this.rBoxProperties = dataset.getNamedModel("rbox");
+        ModelChangedListener rBoxChangedListener = new RBoxListener();
+        this.rBoxProperties.register(rBoxChangedListener);
+
         this.aBoxFacts = dataset.getNamedModel("abox");
         ModelChangedListener aBoxChangedListener = new ABoxListener();
         this.aBoxFacts.register(aBoxChangedListener);
+
         this.model = dataset.getNamedModel("urn:x-arq:UnionGraph");
         dataset.commit();
         dataset.end();

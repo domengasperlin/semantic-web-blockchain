@@ -62,6 +62,23 @@ public class OntologyHelpers {
         saveOntologyToFile(fileName, tBoxOntology, chooseCorrectFormat(fileName));
     }
 
+    public void saveRBoxAxiomsToFile(String fileName) {
+        Set<OWLAxiom> rBoxAxioms = new HashSet<>();
+        for(OWLOntology ontology : ontologies) {
+            rBoxAxioms.addAll(ontology.getRBoxAxioms(Imports.INCLUDED));
+        }
+
+        OWLOntologyManager rBoxManager = OWLManager.createOWLOntologyManager();
+        OWLOntology rBoxOntology = null;
+        try {
+            rBoxOntology = rBoxManager.createOntology();
+        } catch (OWLOntologyCreationException e) {
+            e.printStackTrace();
+        }
+        rBoxManager.addAxioms(rBoxOntology, rBoxAxioms);
+        saveOntologyToFile(fileName, rBoxOntology, chooseCorrectFormat(fileName));
+    }
+
     public void saveABoxAxiomsToFile(String fileName) {
         Set<OWLAxiom> aBoxAxioms = new HashSet<>();
         for(OWLOntology ontology : ontologies) {
