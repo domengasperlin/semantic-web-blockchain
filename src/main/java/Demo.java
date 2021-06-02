@@ -5,15 +5,6 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-// TODO: prepare .ru sparql queries/showcase for toy ontology
-// TODO: prepare .ru sparql queries/showcase for dbpedia
-// TODO: improve efficiency of checking for consistency for large datasets
-// TODO: fix out of RAM when splitting ontologies exception to TBox, ABox - maybe the solution could be reading part of file / loading part of file and dumping it as we go
-// TODO: improve Ethereum smart contract to use less gas
-
-// TODO: remove duplicate code...
-// TODO: Improve error handling
-// TODO: pass CIDs, ontology more compactly as arguments
 public class Demo {
     private static final Logger log = LoggerFactory.getLogger(Demo.class);
     public static void main(String[] args) {
