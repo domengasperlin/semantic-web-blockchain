@@ -1,9 +1,18 @@
 import io.ipfs.api.IPFS;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static org.apache.jena.sparql.sse.SSE.readFile;
 
 public class Demo {
     private static final Logger log = LoggerFactory.getLogger(Demo.class);
@@ -24,32 +33,50 @@ public class Demo {
         // Upload schema and data files to IPFS
         IPFSHelpers ipfsHelpers = new IPFSHelpers(new IPFS(IPFSNodeAddress));
         String aBoxCID = ipfsHelpers.uploadLocalFileToIPFS(aBoxFullPath).toString();
-        String tBoxCID = ipfsHelpers.uploadLocalFileToIPFS(tBoxFullPath).toString();
-        String rBoxCID = ipfsHelpers.uploadLocalFileToIPFS(rBoxFullPath).toString();
-        log.info("[IPFS upload] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID + " rBox CID: "+rBoxCID);
+//        String tBoxCID = ipfsHelpers.uploadLocalFileToIPFS(tBoxFullPath).toString();
+//        String rBoxCID = ipfsHelpers.uploadLocalFileToIPFS(rBoxFullPath).toString();
+//        log.info("[IPFS upload] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID + " rBox CID: "+rBoxCID);
 
         // Store schema and data CIDs to Ethereum
         EthereumHelpers ethereumHelpers = new EthereumHelpers(ethereumNodeAddress, configLoader.isDevelopment());
         ethereumHelpers.loadWalletCredentials(configLoader);
-        String contractAddress = storeDataIdentifiersOnEthereumAndGetContractAddress(ethereumHelpers, tBoxCID, aBoxCID, rBoxCID);
+        String contractAddress = storeDataIdentifiersOnEthereumAndGetContractAddress(ethereumHelpers, tBoxFullPath, aBoxCID, rBoxFullPath);
         // Retrieve schema and data pointers from Ethereum
         String[] ontology = retrieveIPFSHashesForSchemaAndDataFromEthereum(ethereumHelpers, contractAddress);
-        tBoxCID = ontology[0];
+        String tBoxContents = ontology[0];
         aBoxCID = ontology[1];
-        rBoxCID = ontology[2];
+        String rBoxContents = ontology[2];
 
-        log.info("[ETH retrieve] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID + " rBox CID" + rBoxCID);
+        log.info("[ETH retrieve] aBox CID: "+aBoxCID + " tBox CID: "+tBoxContents + " rBox CID" + rBoxContents);
         log.info("[IPFS download and write to files] ");
         // Download data from IPFS to local files
-        downloadDataDownstream(ipfsHelpers, aBoxCID, tBoxCID, rBoxCID, aBoxFullPath, tBoxFullPath, rBoxFullPath);
+        downloadDataDownstream(ipfsHelpers, aBoxCID, tBoxContents, rBoxContents, aBoxFullPath, tBoxFullPath, rBoxFullPath);
         log.info("[Load files to triplestore and run SPARQL] ");
         // Load the schema and data files into the Apache Jena
         loadABoxToBoxToJenaAndPerformSPARQLOperations(aBoxFullPath, tBoxFullPath, rBoxFullPath, SPARQLQueries);
     }
 
-    public static String storeDataIdentifiersOnEthereumAndGetContractAddress(EthereumHelpers ethereumHelpers, String tBoxCID, String aBoxCID, String rBoxCID) {
+    public static void startWithLocalDatabase() {
+
+    }
+
+    public static String storeDataIdentifiersOnEthereumAndGetContractAddress(EthereumHelpers ethereumHelpers, String tBoxFilePath, String aBoxCID, String rBoxFilePath) {
         String contractAddress = ethereumHelpers.deployStorageContract();
-        TransactionReceipt storeTransactionReceipt = ethereumHelpers.loadStorageContractAndCallStoreMethod(contractAddress, tBoxCID, aBoxCID, rBoxCID);
+
+        String tBoxContents = null;
+        String rBoxContents = null;
+
+        try {
+            File tBoxFile = new File(tBoxFilePath);
+            tBoxContents = FileUtils.readFileToString(tBoxFile, StandardCharsets.UTF_8);
+
+            File rBoxFile = new File(rBoxFilePath);
+            rBoxContents = FileUtils.readFileToString(rBoxFile, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        TransactionReceipt storeTransactionReceipt = ethereumHelpers.loadStorageContractAndCallStoreMethod(contractAddress, tBoxContents, aBoxCID, rBoxContents);
         String storeTransactionHash = storeTransactionReceipt.getTransactionHash();
         log.info("Store data transaction: "+storeTransactionHash);
         return contractAddress;
