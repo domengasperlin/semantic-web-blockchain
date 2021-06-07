@@ -16,6 +16,7 @@ public class EthereumHelpers {
     Credentials credentials;
     private BigInteger gasLimit;
     private BigInteger gasPrice;
+    Storage storageContract;
     private static final Logger log = LoggerFactory.getLogger(EthereumHelpers.class);
     public EthereumHelpers(String ethereumNodeAddress, Boolean useGanacheSpecificGasPriceGasLimit) {
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
@@ -25,6 +26,17 @@ public class EthereumHelpers {
         } else {
             gasLimit = new DefaultGasProvider().getGasLimit();
             gasPrice = new DefaultGasProvider().getGasPrice();
+        }
+    }
+
+    public void loadContractAtAddress(String contractAddress) {
+        try {
+            Storage storageContr = Storage.load(contractAddress, web3, credentials, gasPrice, gasLimit);
+            if (storageContr.isValid()) {
+                this.storageContract = storageContr;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -51,6 +63,7 @@ public class EthereumHelpers {
         Storage helloWorld = null;
         try {
             helloWorld = Storage.deploy(web3, credentials, gasPrice, gasLimit).send();
+            storageContract = helloWorld;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -64,7 +77,7 @@ public class EthereumHelpers {
             if (storage.isValid()) {
 //                File file = new File(fileToBeStoredName);
 //                String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                storedTransactionReceipt = storage.storeTBoxABox(tBoxCID, aBoxCID, rBoxCID).send();
+                storedTransactionReceipt = storage.storeTBoxABoxRBox(tBoxCID, aBoxCID, rBoxCID).send();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,5 +101,13 @@ public class EthereumHelpers {
         }
 
         return new String[]{tBoxCID, aBoxCID,rBoxCID};
+    }
+
+    public void updateTBoxInContract(String tBox) {
+        try {
+            this.storageContract.setTBox(tBox).send();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

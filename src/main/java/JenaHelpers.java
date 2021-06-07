@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -94,9 +95,12 @@ public class JenaHelpers {
         this.model = dataset.getNamedModel("urn:x-arq:UnionGraph");
         dataset.commit();
         dataset.end();
+        if (!this.isOntologyConsistent()) {
+            log.warn("Loaded ontology is not consistent!");
+        }
     }
 
-    public Boolean checkConsistency() {
+    public Boolean isOntologyConsistent() {
         // TODO: reasoner should be used when querying OWL ontology
         Reasoner reasoner = ReasonerRegistry.getOWLReasoner().bindSchema(this.tBoxSchema);
         InfModel infModel = ModelFactory.createInfModel(reasoner, this.aBoxFacts);
@@ -111,14 +115,14 @@ public class JenaHelpers {
                 ValidityReport.Report report = iter.next();
                 log.info(report.toString());
             }
-            return true;
+            return false;
         } else {
             log.info("Ontology is consistent");
-            return false;
+            return true;
         }
     }
 
-    public void executeSPARQL(String SPARQLQueryFileLocation) {
+    public void executeSPARQL(String SPARQLQueryFileLocation, String tBoxFullPath, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         File file = new File(SPARQLQueryFileLocation);
         Boolean executeSelect = false;
         try {
@@ -136,7 +140,7 @@ public class JenaHelpers {
         if (executeSelect) {
             executeSPARQLSelectQuery(SPARQLQueryFileLocation);
         } else {
-            executeSPARQLUpdateAction(SPARQLQueryFileLocation);
+            executeSPARQLUpdateAction(SPARQLQueryFileLocation, ipfsHelpers, tBoxFullPath, ethereumHelpers);
         }
 
     }
@@ -156,10 +160,29 @@ public class JenaHelpers {
     }
 
     // TODO: decide how you are going to split operations on abox, tbox. Can't do updates on UnionGraph
-    private void executeSPARQLUpdateAction(String locationOfSPARQL) {
+    private void executeSPARQLUpdateAction(String locationOfSPARQL, IPFSHelpers ipfsHelpers, String tBoxFullPath, EthereumHelpers ethereumHelpers) {
         UpdateRequest request = UpdateFactory.create() ;
         UpdateAction.readExecute(locationOfSPARQL, this.tBoxSchema) ;
         UpdateAction.execute(request, this.tBoxSchema);
+
+        if (isOntologyConsistent()) {
+            log.warn("Changes were persisted");
+            persistChanges(tBoxFullPath, ipfsHelpers, ethereumHelpers);
+        } else {
+            log.warn("Changes made were not persisted because ontology would be no longer consistent");
+        }
+
+    }
+
+    public void persistChanges(String tBoxFullPath, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+        try {
+            RDFDataMgr.write(new FileOutputStream(tBoxFullPath), this.tBoxSchema, RDFFormat.TURTLE);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String tBoxCID = ipfsHelpers.uploadLocalFileToIPFS(tBoxFullPath).toString();
+        ethereumHelpers.updateTBoxInContract(tBoxCID);
+
     }
 
     public void printDatasetToStandardOutput() {

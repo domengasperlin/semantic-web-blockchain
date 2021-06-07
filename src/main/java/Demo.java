@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 public class Demo {
     private static final Logger log = LoggerFactory.getLogger(Demo.class);
+    public static Boolean performLocalDatabaseSync = true;
     public static void main(String[] args) {
         ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
         ArrayList<String> loadOntologyFromFiles = (ArrayList<String>)configLoader.getOntology().get("loadFromFiles");
@@ -21,30 +22,43 @@ public class Demo {
         String rBoxFullPath = getRBoxFilePath(splitOntologyToSchemaDataFiles);
         localDataSchemaSplitAndSaveToFile(loadOntologyFromFiles, aBoxFullPath, tBoxFullPath, rBoxFullPath);
 
-        // Upload schema and data files to IPFS
         IPFSHelpers ipfsHelpers = new IPFSHelpers(new IPFS(IPFSNodeAddress));
-        String aBoxCID = ipfsHelpers.uploadLocalFileToIPFS(aBoxFullPath).toString();
-        String tBoxCID = ipfsHelpers.uploadLocalFileToIPFS(tBoxFullPath).toString();
-        String rBoxCID = ipfsHelpers.uploadLocalFileToIPFS(rBoxFullPath).toString();
-        log.info("[IPFS upload] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID + " rBox CID: "+rBoxCID);
-
-        // Store schema and data CIDs to Ethereum
         EthereumHelpers ethereumHelpers = new EthereumHelpers(ethereumNodeAddress, configLoader.isDevelopment());
         ethereumHelpers.loadWalletCredentials(configLoader);
-        String contractAddress = storeDataIdentifiersOnEthereumAndGetContractAddress(ethereumHelpers, tBoxCID, aBoxCID, rBoxCID);
-        // Retrieve schema and data pointers from Ethereum
-        String[] ontology = retrieveIPFSHashesForSchemaAndDataFromEthereum(ethereumHelpers, contractAddress);
-        tBoxCID = ontology[0];
-        aBoxCID = ontology[1];
-        rBoxCID = ontology[2];
+        String aBoxCID;
+        String tBoxCID;
+        String rBoxCID;
+        if (performLocalDatabaseSync) {
+            // Upload schema and data files to IPFS
+            aBoxCID = ipfsHelpers.uploadLocalFileToIPFS(aBoxFullPath).toString();
+            tBoxCID = ipfsHelpers.uploadLocalFileToIPFS(tBoxFullPath).toString();
+            rBoxCID = ipfsHelpers.uploadLocalFileToIPFS(rBoxFullPath).toString();
+            log.info("[IPFS upload] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID + " rBox CID: "+rBoxCID);
+
+            // Store schema and data CIDs to Ethereum
+            String contractAddress = storeDataIdentifiersOnEthereumAndGetContractAddress(ethereumHelpers, tBoxCID, aBoxCID, rBoxCID);
+            log.info("Contract address: " + contractAddress);
+            // Retrieve schema and data pointers from Ethereum
+            String[] ontology = retrieveIPFSHashesForSchemaAndDataFromEthereum(ethereumHelpers, contractAddress);
+            tBoxCID = ontology[0];
+            aBoxCID = ontology[1];
+            rBoxCID = ontology[2];
+
+        } else {
+            aBoxCID = "QmQ3AP2G8UHpvRNRfNr9q4QG2bukNMME5xiNw27awQGhYw";
+            tBoxCID = "QmNWbKyVzASXa288oHJqntZbGhWCT62f9V7q3qzRQmUwar";
+            rBoxCID = "QmVjjHGYaFBaCrvxp8TTPV3Pz5tB9Sa6sMSyJMkYafN4y7";
+            String smartContractAddress = "0xc3d2cf25eDBb8A3eCb06057aeFE4945A87B6b6a6";
+            ethereumHelpers.loadContractAtAddress(smartContractAddress);
+            downloadDataDownstream(ipfsHelpers, aBoxCID, tBoxCID, rBoxCID, aBoxFullPath, tBoxFullPath, rBoxFullPath);
+        }
 
         log.info("[ETH retrieve] aBox CID: "+aBoxCID + " tBox CID: "+tBoxCID + " rBox CID" + rBoxCID);
         log.info("[IPFS download and write to files] ");
         // Download data from IPFS to local files
-        downloadDataDownstream(ipfsHelpers, aBoxCID, tBoxCID, rBoxCID, aBoxFullPath, tBoxFullPath, rBoxFullPath);
-        log.info("[Load files to triplestore and run SPARQL] ");
+
         // Load the schema and data files into the Apache Jena
-        loadABoxToBoxToJenaAndPerformSPARQLOperations(aBoxFullPath, tBoxFullPath, rBoxFullPath, SPARQLQueries);
+        loadABoxToBoxToJenaAndPerformSPARQLOperations(aBoxFullPath, tBoxFullPath, rBoxFullPath, SPARQLQueries, ipfsHelpers, ethereumHelpers);
     }
 
     public static String storeDataIdentifiersOnEthereumAndGetContractAddress(EthereumHelpers ethereumHelpers, String tBoxCID, String aBoxCID, String rBoxCID) {
@@ -105,19 +119,14 @@ public class Demo {
         ipfsHelpers.retrieveFileAndSaveItToLocalSystem(rBoxFileHash, rBoxFullPath);
     }
 
-    public static void loadABoxToBoxToJenaAndPerformSPARQLOperations(String aBoxFullPath, String tBoxFullPath, String rBoxFullPath, ArrayList<String> SPARQLQueries) {
+    public static void loadABoxToBoxToJenaAndPerformSPARQLOperations(String aBoxFullPath, String tBoxFullPath, String rBoxFullPath, ArrayList<String> SPARQLQueries, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath, rBoxFullPath);
-        jenaHelpers.checkConsistency();
 //        JenaHelpers jenaHelpers = new JenaHelpers(inputDBPediaTBoxFullPath, inputDBPediaABoxFullPath);
 
         for(String query : SPARQLQueries) {
             log.info("[Executing SPARQL from file] "+query);
-            jenaHelpers.executeSPARQL(query);
+            jenaHelpers.executeSPARQL(query, tBoxFullPath, ipfsHelpers, ethereumHelpers);
             jenaHelpers.printDatasetToStandardOutput();
-            jenaHelpers.checkConsistency();
-            // TODO: if jenaHelpers.checkConsistency()
-            //          persistChangesToTripleStore
-            //          sync changes to blockchain
         }
     }
 

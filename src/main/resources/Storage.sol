@@ -6,10 +6,14 @@ contract Storage {
     string aBox;
     string rBox;
 
-    function storeTBoxABox(string memory _tBox, string memory _aBox, string memory _rBox) public {
+    function storeTBoxABoxRBox(string memory _tBox, string memory _aBox, string memory _rBox) public {
         tBox = _tBox;
         aBox = _aBox;
         rBox = _rBox;
+    }
+
+    function setTBox(string memory _tBox) public {
+        tBox = _tBox;
     }
 
     function getTBox() public view returns (string memory) {
@@ -20,7 +24,15 @@ contract Storage {
         return aBox;
     }
 
+    function setABox(string memory _aBox) public {
+        aBox = _aBox;
+    }
+
     function getRBox() public view returns (string memory) {
         return rBox;
+    }
+
+    function setRBox(string memory _rBox) public {
+        rBox = _rBox;
     }
 }
