@@ -1,104 +1,85 @@
-_:genid1621939721 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
-# 
-# 
-# #################################################################
-# #
-# #    Object Properties
-# #
-# #################################################################
-# 
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaPredavatelja
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaPredavatelja> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaPredavatelja> <http://www.w3.org/2002/07/owl#inverseOf> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#FunctionalProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AsymmetricProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudent> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeČlanica
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#je\u010Clanica> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#je\u010Clanica> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ReflexiveProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#je\u010Clanica> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#je\u010Clanica> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AsymmetricProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudent> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#AsymmetricProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#ObjectProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudij> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudij> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> .
-# 
-# 
-# 
-# #################################################################
-# #
-# #    Data properties
-# #
-# #################################################################
-# 
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisnoŠtevilko
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisno\u0160tevilko> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisno\u0160tevilko> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudent> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisno\u0160tevilko> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#integer> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeBruc
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeBruc> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#DatatypeProperty> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeBruc> <http://www.w3.org/2000/01/rdf-schema#domain> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudent> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeBruc> <http://www.w3.org/2000/01/rdf-schema#range> <http://www.w3.org/2001/XMLSchema#boolean> .
-# 
-# 
-# 
-# #################################################################
-# #
-# #    Classes
-# #
-# #################################################################
-# 
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudij> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudij> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor> <http://www.w3.org/2002/07/owl#disjointWith> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#\u0160tudent> .
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent
-# 
-# http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij
-# 
-# Generated by the OWL API (version 4.1.3.20151118-2017) https://github.com/owlcs/owlapi
+[ a       <http://www.w3.org/2002/07/owl#Ontology> ] .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaPredavatelja>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+        <http://www.w3.org/2002/07/owl#inverseOf>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> , <http://www.w3.org/2002/07/owl#AsymmetricProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> , <http://www.w3.org/2002/07/owl#FunctionalProperty> , <http://www.w3.org/2002/07/owl#AsymmetricProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeČlanica>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> , <http://www.w3.org/2002/07/owl#ReflexiveProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> , <http://www.w3.org/2002/07/owl#AsymmetricProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Modul> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2002/07/owl#disjointWith>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisnoŠtevilko>
+        a       <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#integer> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> .

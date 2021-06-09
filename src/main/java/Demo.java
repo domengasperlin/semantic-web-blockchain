@@ -2,7 +2,6 @@ import io.ipfs.api.IPFS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-
 import java.util.ArrayList;
 
 public class Demo {
@@ -62,7 +61,6 @@ public class Demo {
             tBoxCID = contractCIDs[0];
             aBoxCID = contractCIDs[1];
             rBoxCID = contractCIDs[2];
-            ethereumHelpers.loadContractAtAddress(smartContractAddress);
             log.info("[IPFS download and write to files] ");
             ipfsHelpers.retrieveFileAndSaveItToLocalSystem(aBoxCID, aBoxFullPath);
             ipfsHelpers.retrieveFileAndSaveItToLocalSystem(tBoxCID, tBoxFullPath);
