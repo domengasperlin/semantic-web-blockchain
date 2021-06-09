@@ -70,14 +70,13 @@ public class EthereumHelpers {
         return helloWorld.getContractAddress();
     }
 
-    public TransactionReceipt loadStorageContractAndCallStoreMethod(String contractAddress, String tBoxCID, String aBoxCID, String rBoxCID) {
+    public TransactionReceipt callStoreMethodOfContract(String tBoxCID, String aBoxCID, String rBoxCID) {
         TransactionReceipt storedTransactionReceipt = null;
         try {
-            Storage storage = Storage.load(contractAddress, web3, credentials, gasPrice, gasLimit);
-            if (storage.isValid()) {
+            if (this.storageContract.isValid()) {
 //                File file = new File(fileToBeStoredName);
 //                String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                storedTransactionReceipt = storage.storeTBoxABoxRBox(tBoxCID, aBoxCID, rBoxCID).send();
+                storedTransactionReceipt = this.storageContract.storeTBoxABoxRBox(tBoxCID, aBoxCID, rBoxCID).send();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,16 +84,15 @@ public class EthereumHelpers {
         return storedTransactionReceipt;
     }
 
-    public String[] loadStorageContractAndCallRetrieveMethod(String contractAddress) {
+    public String[] callRetrieveTBoxABoxRBoxMethods() {
         String tBoxCID = null;
         String aBoxCID = null;
         String rBoxCID = null;
         try {
-            Storage storageContract = Storage.load(contractAddress, web3, credentials, gasPrice, gasLimit);
-            if (storageContract.isValid()) {
-                tBoxCID = storageContract.getTBox().send();
-                aBoxCID = storageContract.getABox().send();
-                rBoxCID = storageContract.getRBox().send();
+            if (this.storageContract.isValid()) {
+                tBoxCID = this.storageContract.getTBox().send();
+                aBoxCID = this.storageContract.getABox().send();
+                rBoxCID = this.storageContract.getRBox().send();
             }
         } catch (Exception e) {
             e.printStackTrace();
