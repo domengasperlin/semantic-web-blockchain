@@ -55,7 +55,7 @@ public class Demo {
 
         } else {
             // Download dataset from blockchain
-            String smartContractAddress = "0xbf933943074847bb2c8eb99c5678cd7a3b64f1c6";
+            String smartContractAddress = "0xa9be0caf3c4e57329592fa77fb5d6e3ee49b46f2";
             ethereumHelpers.loadContractAtAddress(smartContractAddress);
             String[] contractCIDs = ethereumHelpers.callRetrieveTBoxABoxRBoxMethods();
             tBoxCID = contractCIDs[0];
