@@ -37,6 +37,7 @@ Load toy ontology
 ```bash
 tdbloader --graph=abox --loc ./target/dataset ./ipfs-files/output/abox-axioms.ttl
 tdbloader --graph=tbox --loc ./target/dataset ./ipfs-files/output/tbox-axioms.ttl
+tdbloader --graph=rbox --loc ./target/dataset ./ipfs-files/output/rbox-axioms.ttl
 ```
 or subset of DBpedia
 ```bash
