@@ -6,8 +6,8 @@ ontology:
   #  - ABox_DBpedia_instance-types_lang=en_specific.ttl.gz
   dumpToFiles:
     - rbox: ipfs-files/output/rbox-axioms.ttl
-    - abox: ipfs-files/output/abox-axioms.nt
-    - tbox: ipfs-files/output/tbox-axioms.nt
+    - abox: ipfs-files/output/abox-axioms.ttl
+    - tbox: ipfs-files/output/tbox-axioms.ttl
   SPARQLQueries:
     - rdf-sparql/input/select-abox.ru
     - rdf-sparql/input/delete-abox.ru

@@ -48,9 +48,7 @@
                 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> .
 
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet>
-        a       <http://www.w3.org/2002/07/owl#Class> ;
-        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
-                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Modul> .
+        a       <http://www.w3.org/2002/07/owl#Class> .
 
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor>
         a       <http://www.w3.org/2002/07/owl#Class> ;
@@ -74,12 +72,24 @@
         <http://www.w3.org/2000/01/rdf-schema#range>
                 <http://www.w3.org/2001/XMLSchema#integer> .
 
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeBruc>
+        a       <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#boolean> .
+
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski>
         a       <http://www.w3.org/2002/07/owl#Class> ;
         <http://www.w3.org/2000/01/rdf-schema#subClassOf>
                 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> .
 
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski>
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Magistrski>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Doktorski>
         a       <http://www.w3.org/2002/07/owl#Class> ;
         <http://www.w3.org/2000/01/rdf-schema#subClassOf>
                 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> .

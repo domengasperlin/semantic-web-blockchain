@@ -1,0 +1,87 @@
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeČlanica>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisnoŠtevilko>
+        a       <http://www.w3.org/2002/07/owl#DatatypeProperty> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski>
+        a       <http://www.w3.org/2002/07/owl#Class> .
+
+[ a       <http://www.w3.org/2002/07/owl#Ontology> ] .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Drugi_Letnik>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik> , <http://www.w3.org/2002/07/owl#NamedIndividual> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta_za_računalništvo_in_informatiko>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> , <http://www.w3.org/2002/07/owl#NamedIndividual> ;
+        <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeČlanica>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza_v_Ljubljani> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza_v_Ljubljani>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza> , <http://www.w3.org/2002/07/owl#NamedIndividual> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Franc_Horvat>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor> , <http://www.w3.org/2002/07/owl#NamedIndividual> ;
+        <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Obdelava_naravnega_jezika> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Obdelava_naravnega_jezika>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> , <http://www.w3.org/2002/07/owl#NamedIndividual> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Janez_Novak>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> , <http://www.w3.org/2002/07/owl#NamedIndividual> ;
+        <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisnoŠtevilko>
+                63199999 ;
+        <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Drugi_Letnik> ;
+        <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Obdelava_naravnega_jezika> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Prvi_letnik>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik> , <http://www.w3.org/2002/07/owl#NamedIndividual> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Tretji_letnik>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik> , <http://www.w3.org/2002/07/owl#NamedIndividual> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(UNI)>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski> , <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski> , <http://www.w3.org/2002/07/owl#NamedIndividual> ;
+        <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta_za_računalništvo_in_informatiko> .
+
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(VS)>
+        a       <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski> , <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski> , <http://www.w3.org/2002/07/owl#NamedIndividual> ;
+        <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja>
+                <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta_za_računalništvo_in_informatiko> .
