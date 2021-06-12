@@ -6,7 +6,8 @@ import java.util.ArrayList;
 
 public class Demo {
     private static final Logger log = LoggerFactory.getLogger(Demo.class);
-    public static Boolean uploadLocalDatabaseToBlockchains = false;
+    public static Boolean uploadLocalDatabaseToBlockchains = true;
+    public static Boolean useReasoner = false;
 
     public static void main(String[] args) {
         ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
@@ -67,7 +68,7 @@ public class Demo {
         }
 
         // Load the ABox, TBox, RBox files into the Apache Jena
-        JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath, rBoxFullPath);
+        JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath, rBoxFullPath, useReasoner);
 
         for (String query : SPARQLQueries) {
             log.info("[Executing SPARQL from query file (.rq)] " + query);

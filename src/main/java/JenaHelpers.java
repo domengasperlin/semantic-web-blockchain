@@ -68,9 +68,10 @@ public class JenaHelpers {
     private Model aBoxFacts;
     private Model rBoxProperties;
     private static String datasetLocation = "target/dataset";
+    private static Boolean useReasoner;
 
     private static final Logger log = LoggerFactory.getLogger(JenaHelpers.class);
-    public JenaHelpers(String tBoxFileName, String aBoxFileName, String rBoxFileName) {
+    public JenaHelpers(String tBoxFileName, String aBoxFileName, String rBoxFileName, Boolean useReasoner) {
         // https://jena.apache.org/documentation/tdb/datasets.html set default graph as union of named graphs, TODO: check this
         TDB.getContext().set(TDB.symUnionDefaultGraph, true);
         FileManager fm = FileManager.get();
@@ -99,13 +100,18 @@ public class JenaHelpers {
         this.aBoxFacts.register(aBoxChangedListener);
 
         this.model = dataset.getNamedModel("urn:x-arq:UnionGraph");
-
-        if (isOntologyConsistent(AxiomFileType.ABox, this.aBoxFacts)) {
+        this.useReasoner = useReasoner;
+        if (useReasoner) {
+            if (isOntologyConsistent(AxiomFileType.ABox, this.aBoxFacts)) {
+                dataset.commit();
+                dataset.end();
+            } else {
+                dataset.abort();
+                log.error("Ontology was not committed because it is not consistent!");
+            }
+        } else {
             dataset.commit();
             dataset.end();
-        } else {
-            dataset.abort();
-            log.error("Ontology was not committed because it is not consistent!");
         }
     }
 
@@ -197,15 +203,15 @@ public class JenaHelpers {
         } else {
             Model targetModel = null;
             AxiomFileType axiomFileType = null;
-            if (axiomFileFullPath.contains("tbox")) {
+            if (axiomFileFullPath.toLowerCase().contains("tbox")) {
                 targetModel = this.tBoxSchema;
                 axiomFileType = AxiomFileType.TBox;
             }
-            if (axiomFileFullPath.contains("abox")) {
+            if (axiomFileFullPath.toLowerCase().contains("abox")) {
                 targetModel = this.aBoxFacts;
                 axiomFileType = AxiomFileType.ABox;
             }
-            if (axiomFileFullPath.contains("rbox")) {
+            if (axiomFileFullPath.toLowerCase().contains("rbox")) {
                 targetModel = this.rBoxProperties;
                 axiomFileType = AxiomFileType.RBox;
             }
@@ -242,14 +248,19 @@ public class JenaHelpers {
         UpdateAction.readExecute(locationOfSPARQL, targetModel) ;
         UpdateAction.execute(request, targetModel);
 
-        if (isOntologyConsistent(axiomFileType, targetModel)) {
-            log.debug("Changes were executed");
-            uploadChangesToBlockchains(axiomFileFullPath, axiomFileType, targetModel, ipfsHelpers, ethereumHelpers);
-            return true;
-        } else {
-            log.error("Changes were not made because ontology would be no longer consistent");
+        if (this.useReasoner) {
+            if (isOntologyConsistent(axiomFileType, targetModel)) {
+                log.debug("Changes were executed");
+                uploadChangesToBlockchains(axiomFileFullPath, axiomFileType, targetModel, ipfsHelpers, ethereumHelpers);
+                return true;
+            } else {
+                log.error("Changes were not made because ontology would be no longer consistent");
+            }
+            return false;
         }
-        return false;
+        log.debug("Changes were executed");
+        uploadChangesToBlockchains(axiomFileFullPath, axiomFileType, targetModel, ipfsHelpers, ethereumHelpers);
+        return true;
 
     }
 
