@@ -51,7 +51,7 @@ public class Demo {
             tBoxCID = contractCIDs[0];
             aBoxCID = contractCIDs[1];
             rBoxCID = contractCIDs[2];
-            log.info("[ETH retrieve] aBox CID: " + aBoxCID + " tBox CID: " + tBoxCID + " rBox CID" + rBoxCID);
+            log.info("[ETH retrieve] ABox CID: " + aBoxCID + " TBox CID: " + tBoxCID + " RBox CID" + rBoxCID);
 
         } else {
             // Download dataset from blockchain
@@ -72,8 +72,19 @@ public class Demo {
 
         for (String query : SPARQLQueries) {
             log.info("[Executing SPARQL from query file (.rq)] " + query);
-            jenaHelpers.executeSPARQL(query, tBoxFullPath, ipfsHelpers, ethereumHelpers);
-            jenaHelpers.printDatasetToStandardOutput();
+            if (query.contains("tbox")) {
+                Boolean successful = jenaHelpers.executeSPARQL(query, tBoxFullPath, ipfsHelpers, ethereumHelpers);
+                if (!successful) break;
+            }
+            if (query.contains("abox")) {
+                Boolean successful = jenaHelpers.executeSPARQL(query, aBoxFullPath, ipfsHelpers, ethereumHelpers);
+                if (!successful) break;
+            }
+            if (query.contains("rbox")) {
+                Boolean successful = jenaHelpers.executeSPARQL(query, rBoxFullPath, ipfsHelpers, ethereumHelpers);
+                if (!successful) break;
+            }
+            // jenaHelpers.printDatasetToStandardOutput();
         }
     }
 

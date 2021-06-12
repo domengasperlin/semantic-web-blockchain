@@ -145,9 +145,10 @@
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Janez_Novak
 :Janez_Novak rdf:type owl:NamedIndividual ,
                       :Študent ;
-             :jeVpisan :Drugi_Letnik ;
+             :jeVpisan :Prvi_letnik ;
              :obiskuje :Obdelava_naravnega_jezika ;
-             :imaVpisnoŠtevilko 63199999 .
+             :imaVpisnoŠtevilko 63199999 ;
+             :jeBruc "true"^^xsd:boolean .
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Obdelava_naravnega_jezika

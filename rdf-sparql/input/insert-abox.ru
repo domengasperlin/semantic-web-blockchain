@@ -6,8 +6,7 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 INSERT DATA
 {
-  :Predmet rdf:type owl:Class ;
-           rdfs:subClassOf :Modul .
+  :Janez_Novak :jeVpisan :Drugi_Letnik .
 }
 # Demo adding inconsistent data to ontology
 # INSERT DATA

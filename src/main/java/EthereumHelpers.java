@@ -108,4 +108,20 @@ public class EthereumHelpers {
             e.printStackTrace();
         }
     }
+
+    public void updateABoxInContract(String ABox) {
+        try {
+            this.storageContract.setABox(ABox).send();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateRBoxInContract(String RBox) {
+        try {
+            this.storageContract.setRBox(RBox).send();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
