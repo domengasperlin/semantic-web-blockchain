@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Demo {
     private static final Logger log = LoggerFactory.getLogger(Demo.class);
-    public static Boolean uploadLocalDatabaseToBlockchains = true;
+    public static Boolean uploadLocalDatabaseToBlockchains = false;
 
     public static void main(String[] args) {
         ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
@@ -15,16 +15,6 @@ public class Demo {
         String ethereumNodeAddress = (String) configLoader.getEthereum().get("nodeAddress");
         ArrayList<String> SPARQLQueries = (ArrayList<String>) configLoader.getOntology().get("SPARQLQueries");
 
-        String aBoxFullPath = configLoader.getABoxFilePath();
-        String tBoxFullPath = configLoader.getTBoxFilePath();
-        String rBoxFullPath = configLoader.getRBoxFilePath();
-
-        // Separate ontology to axiom files
-        OntologyHelpers ontologyHelpers = new OntologyHelpers(inputOntologyFiles);
-        ontologyHelpers.saveABoxAxiomsToFile(aBoxFullPath);
-        ontologyHelpers.saveTBoxAxiomsToFile(tBoxFullPath);
-        ontologyHelpers.saveRBoxAxiomsToFile(rBoxFullPath);
-
         EthereumHelpers ethereumHelpers = new EthereumHelpers(ethereumNodeAddress, configLoader.isDevelopment());
         ethereumHelpers.loadWalletCredentials(configLoader);
         IPFSHelpers ipfsHelpers = new IPFSHelpers(new IPFS(IPFSNodeAddress));
@@ -32,7 +22,16 @@ public class Demo {
         String aBoxCID;
         String tBoxCID;
         String rBoxCID;
+        String aBoxFullPath = configLoader.getABoxFilePath();
+        String tBoxFullPath = configLoader.getTBoxFilePath();
+        String rBoxFullPath = configLoader.getRBoxFilePath();
         if (uploadLocalDatabaseToBlockchains) {
+            // Separate ontology to axiom files
+            OntologyHelpers ontologyHelpers = new OntologyHelpers(inputOntologyFiles);
+            ontologyHelpers.saveABoxAxiomsToFile(aBoxFullPath);
+            ontologyHelpers.saveTBoxAxiomsToFile(tBoxFullPath);
+            ontologyHelpers.saveRBoxAxiomsToFile(rBoxFullPath);
+
             // Upload ABox, TBox, RBox files to IPFS
             aBoxCID = ipfsHelpers.uploadLocalFileToIPFS(aBoxFullPath).toString();
             tBoxCID = ipfsHelpers.uploadLocalFileToIPFS(tBoxFullPath).toString();
