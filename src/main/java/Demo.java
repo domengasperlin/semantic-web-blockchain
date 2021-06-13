@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 public class Demo {
     private static final Logger log = Logger.getLogger(Demo.class.getName());
     public static Boolean uploadLocalDatabaseToBlockchains = true;
-    public static Boolean useReasoner = true;
+    public static Boolean useReasoner = false;
     public static Boolean performOntologySplit = true;
 
     public static void main(String[] args) {

@@ -110,12 +110,12 @@ public class JenaHelpers {
         this.rBoxProperties = dataset.getNamedModel("rbox");
         this.model = dataset.getUnionModel();
 
-        ModelChangedListener tBoxChangedListener = new TBoxListener();
-        this.tBoxSchema.register(tBoxChangedListener);
-        ModelChangedListener rBoxChangedListener = new RBoxListener();
-        this.rBoxProperties.register(rBoxChangedListener);
-        ModelChangedListener aBoxChangedListener = new ABoxListener();
-        this.aBoxFacts.register(aBoxChangedListener);
+//        ModelChangedListener tBoxChangedListener = new TBoxListener();
+//        this.tBoxSchema.register(tBoxChangedListener);
+//        ModelChangedListener rBoxChangedListener = new RBoxListener();
+//        this.rBoxProperties.register(rBoxChangedListener);
+//        ModelChangedListener aBoxChangedListener = new ABoxListener();
+//        this.aBoxFacts.register(aBoxChangedListener);
 
         if (useReasoner) {
             if (isOntologyConsistent(AxiomFileType.ABox, this.aBoxFacts)) {

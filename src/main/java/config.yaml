@@ -9,12 +9,13 @@ ontology:
     - abox: ipfs-files/output/abox-axioms.ttl
     - tbox: ipfs-files/output/tbox-axioms.ttl
   SPARQLQueries:
-    - rdf-sparql/input/select-abox.ru
-    - rdf-sparql/input/delete-abox.ru
-#    - rdf-sparql/input/delete-rbox.ru
-    - rdf-sparql/input/insert-abox.ru
-    - rdf-sparql/input/delete-tbox.ru
-    - rdf-sparql/input/insert-tbox.ru
+    - rdf-sparql/input/select-dbpedia-abox.ru
+#    - rdf-sparql/input/select-abox.ru
+#    - rdf-sparql/input/delete-abox.ru
+##    - rdf-sparql/input/delete-rbox.ru
+#    - rdf-sparql/input/insert-abox.ru
+#    - rdf-sparql/input/delete-tbox.ru
+#    - rdf-sparql/input/insert-tbox.ru
 IPFS:
   nodeAddress: /ip4/127.0.0.1/tcp/5001
 ethereum:
