@@ -3,20 +3,19 @@ import org.semanticweb.owlapi.formats.NTriplesDocumentFormat;
 import org.semanticweb.owlapi.formats.TurtleDocumentFormat;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.model.parameters.Imports;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 public class OntologyHelpers {
     private Set<OWLOntology> ontologies;
-    private static final Logger log = LoggerFactory.getLogger(OntologyHelpers.class);
+    private static final Logger log = Logger.getLogger(OntologyHelpers.class.getName());
     public OntologyHelpers(ArrayList<String> filesToLoad) {
         if (filesToLoad.size() < 1) {
-            log.error("Must have at least 1 input ontology");
+            log.severe("Must have at least 1 input ontology");
             return;
         }
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -41,7 +40,7 @@ public class OntologyHelpers {
         if (fileName.contains("nt")) {
             return new NTriplesDocumentFormat();
         }
-        log.error("chooseCorrectFormat could not guess format from file extension");
+        log.severe("chooseCorrectFormat could not guess format from file extension");
         return null;
     }
 

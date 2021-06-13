@@ -1,5 +1,4 @@
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -8,17 +7,18 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class ConfigLoader {
     Map<String, Object> data;
-    private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
+    private static final Logger log = Logger.getLogger(ConfigLoader.class.getName());
     public ConfigLoader(String path) {
         try {
             InputStream inputStream = new FileInputStream(new File(path));
             Yaml yaml = new Yaml();
             data = yaml.load(inputStream);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.severe(e.getMessage());
         }
     }
 
@@ -46,7 +46,7 @@ public class ConfigLoader {
             }
         }
 
-        log.error("Dump files must contain rbox, abox, tbox files");
+        log.severe("Dump files must contain rbox, abox, tbox files");
         return null;
     }
 
@@ -57,7 +57,7 @@ public class ConfigLoader {
                 return el.get("tbox");
             }
         }
-        log.error("Dump files must contain rbox, abox, tbox files");
+        log.severe( "Dump files must contain rbox, abox, tbox files");
         return null;
     }
 
@@ -68,7 +68,7 @@ public class ConfigLoader {
                 return el.get("rbox");
             }
         }
-        log.error("Dump files must contain rbox, abox, tbox files");
+        log.severe("Dump files must contain rbox, abox, tbox files");
         return null;
     }
 

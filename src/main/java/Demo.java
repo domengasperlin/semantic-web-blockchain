@@ -1,13 +1,13 @@
 import io.ipfs.api.IPFS;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class Demo {
-    private static final Logger log = LoggerFactory.getLogger(Demo.class);
+    private static final Logger log = Logger.getLogger(Demo.class.getName());
     public static Boolean uploadLocalDatabaseToBlockchains = true;
-    public static Boolean useReasoner = false;
+    public static Boolean useReasoner = true;
 
     public static void main(String[] args) {
         ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
@@ -46,16 +46,9 @@ public class Demo {
             TransactionReceipt storeTransactionReceipt = ethereumHelpers.callStoreMethodOfContract(tBoxCID, aBoxCID, rBoxCID);
             log.info("[ETH] transaction: " + storeTransactionReceipt.getTransactionHash());
 
-            // Retrieve schema and data pointers from Ethereum
-            String[] contractCIDs = ethereumHelpers.callRetrieveTBoxABoxRBoxMethods();
-            tBoxCID = contractCIDs[0];
-            aBoxCID = contractCIDs[1];
-            rBoxCID = contractCIDs[2];
-            log.info("[ETH retrieve] ABox CID: " + aBoxCID + " TBox CID: " + tBoxCID + " RBox CID" + rBoxCID);
-
         } else {
             // Download dataset from blockchain
-            String smartContractAddress = "0xa9be0caf3c4e57329592fa77fb5d6e3ee49b46f2";
+            String smartContractAddress = "0x0c3b4bfbc2bead8defb3a3217ee77a34a7a9b2d4";
             ethereumHelpers.loadContractAtAddress(smartContractAddress);
             String[] contractCIDs = ethereumHelpers.callRetrieveTBoxABoxRBoxMethods();
             tBoxCID = contractCIDs[0];

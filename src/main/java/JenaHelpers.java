@@ -1,3 +1,4 @@
+import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.listeners.StatementListener;
 import org.apache.jena.rdf.model.*;
@@ -6,19 +7,20 @@ import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.reasoner.ValidityReport;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
-import org.apache.jena.tdb.TDB;
-import org.apache.jena.tdb.TDBFactory;
+import org.apache.jena.tdb2.TDB2;
+import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.update.UpdateAction;
 import org.apache.jena.update.UpdateFactory;
 import org.apache.jena.update.UpdateRequest;
 import org.apache.jena.util.FileManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 enum AxiomFileType {
     TBox,
@@ -63,55 +65,68 @@ class ABoxListener extends StatementListener {
 }
 
 public class JenaHelpers {
+    private static String datasetLocation = "target/dataset";
+    Dataset dataset;
+    private static Boolean useReasoner;
     private Model model;
     private Model tBoxSchema;
     private Model aBoxFacts;
     private Model rBoxProperties;
-    private static String datasetLocation = "target/dataset";
-    private static Boolean useReasoner;
 
-    private static final Logger log = LoggerFactory.getLogger(JenaHelpers.class);
+    private static final Logger log = Logger.getLogger(JenaHelpers.class.getName());
     public JenaHelpers(String tBoxFileName, String aBoxFileName, String rBoxFileName, Boolean useReasoner) {
-        // https://jena.apache.org/documentation/tdb/datasets.html set default graph as union of named graphs, TODO: check this
-        TDB.getContext().set(TDB.symUnionDefaultGraph, true);
+        log.setLevel(Level.FINE);
         FileManager fm = FileManager.get();
+        // https://jena.apache.org/documentation/tdb/datasets.html set default graph as union of named graphs, TODO: check this
+        TDB2.getContext().set(TDB2.symUnionDefaultGraph, true);
+        dataset = TDB2Factory.connectDataset(Location.create(datasetLocation));
 
-        Dataset dataset = TDBFactory.createDataset(datasetLocation);
-        dataset.begin(ReadWrite.WRITE);
-        if (!dataset.containsNamedModel("tbox")) {
+        dataset.begin(ReadWrite.READ);
+        Boolean containsTBox = dataset.containsNamedModel("tbox");
+        Boolean containsABox = dataset.containsNamedModel("abox");
+        Boolean containsRBox = dataset.containsNamedModel("rbox");
+        dataset.end();
+
+        if (!containsTBox) {
+            dataset.begin(ReadWrite.WRITE);
             fm.readModel(dataset.getNamedModel("tbox"), tBoxFileName);
-        }
-        if (!dataset.containsNamedModel("abox")) {
-            fm.readModel(dataset.getNamedModel("abox"), aBoxFileName);
-        }
-        if (!dataset.containsNamedModel("rbox")) {
-            fm.readModel(dataset.getNamedModel("rbox"), rBoxFileName);
+            dataset.commit();
         }
         this.tBoxSchema = dataset.getNamedModel("tbox");
+        if (!containsABox) {
+            dataset.begin(ReadWrite.WRITE);
+            fm.readModel(dataset.getNamedModel("abox"), aBoxFileName);
+            dataset.commit();
+        }
+        this.aBoxFacts = dataset.getNamedModel("abox");
+        if (!containsRBox) {
+            dataset.begin(ReadWrite.WRITE);
+            fm.readModel(dataset.getNamedModel("rbox"), rBoxFileName);
+            dataset.commit();
+        }
+        this.rBoxProperties = dataset.getNamedModel("rbox");
+
+        dataset.begin(ReadWrite.READ);
         ModelChangedListener tBoxChangedListener = new TBoxListener();
         this.tBoxSchema.register(tBoxChangedListener);
 
-        this.rBoxProperties = dataset.getNamedModel("rbox");
         ModelChangedListener rBoxChangedListener = new RBoxListener();
         this.rBoxProperties.register(rBoxChangedListener);
 
-        this.aBoxFacts = dataset.getNamedModel("abox");
         ModelChangedListener aBoxChangedListener = new ABoxListener();
         this.aBoxFacts.register(aBoxChangedListener);
 
-        this.model = dataset.getNamedModel("urn:x-arq:UnionGraph");
+        this.model = dataset.getUnionModel();
         this.useReasoner = useReasoner;
         if (useReasoner) {
             if (isOntologyConsistent(AxiomFileType.ABox, this.aBoxFacts)) {
                 dataset.commit();
-                dataset.end();
             } else {
                 dataset.abort();
-                log.error("Ontology was not committed because it is not consistent!");
+                log.severe( "Ontology was not committed because it is not consistent!");
             }
         } else {
             dataset.commit();
-            dataset.end();
         }
     }
 
@@ -123,7 +138,7 @@ public class JenaHelpers {
 
             ValidityReport validityReportTBoxABox = infModelTBoxABox.validate();
             if ( !validityReportTBoxABox.isValid() ) {
-                log.debug("Ontology TBoxABox is not consistent");
+                log.fine("Ontology TBoxABox is not consistent");
                 Iterator<ValidityReport.Report> iter = validityReportTBoxABox.getReports();
                 while ( iter.hasNext() ) {
                     ValidityReport.Report report = iter.next();
@@ -131,7 +146,7 @@ public class JenaHelpers {
                 }
                 return false;
             } else {
-                log.debug("Ontology TBoxABox is consistent");
+                log.fine( "Ontology TBoxABox is consistent");
             }
 
             Reasoner reasonerRBox = ReasonerRegistry.getOWLReasoner().bindSchema(this.rBoxProperties);
@@ -139,7 +154,7 @@ public class JenaHelpers {
 
             ValidityReport validityReportRBoxABox = infModelRBoxABox.validate();
             if ( !validityReportRBoxABox.isValid() ) {
-                log.debug("Ontology RBoxABox is not consistent");
+                log.fine("Ontology RBoxABox is not consistent");
                 Iterator<ValidityReport.Report> iter = validityReportRBoxABox.getReports();
                 while ( iter.hasNext() ) {
                     ValidityReport.Report report = iter.next();
@@ -147,9 +162,8 @@ public class JenaHelpers {
                 }
                 return false;
             } else {
-                log.debug("Ontology RBoxABox is consistent");
+                log.fine("Ontology RBoxABox is consistent");
             }
-            this.aBoxFacts = targetModel;
             return true;
         }
 
@@ -160,7 +174,7 @@ public class JenaHelpers {
 
         ValidityReport validityReport1 = infModelTBoxRBox.validate();
         if ( !validityReport1.isValid() ) {
-            log.warn("Ontology "+axiomFileType+" is not consistent");
+            log.warning("Ontology "+axiomFileType+" is not consistent");
             Iterator<ValidityReport.Report> iter = validityReport1.getReports();
             while ( iter.hasNext() ) {
                 ValidityReport.Report report = iter.next();
@@ -168,16 +182,14 @@ public class JenaHelpers {
             }
             return false;
         } else {
-            log.debug("Ontology "+axiomFileType+" is consistent");
+            log.fine("Ontology "+axiomFileType+" is consistent");
             if (axiomFileType == AxiomFileType.TBox) {
-                this.tBoxSchema = targetModel;
                 return true;
             }
             if (axiomFileType == AxiomFileType.RBox) {
-                this.rBoxProperties = targetModel;
                 return true;
             }
-            log.error("Unexpected state");
+            log.severe("Unexpected state");
             return false;
         }
 
@@ -201,30 +213,15 @@ public class JenaHelpers {
         if (executeSelect) {
             return executeSPARQLSelectQuery(SPARQLQueryFileLocation);
         } else {
-            Model targetModel = null;
-            AxiomFileType axiomFileType = null;
-            if (axiomFileFullPath.toLowerCase().contains("tbox")) {
-                targetModel = this.tBoxSchema;
-                axiomFileType = AxiomFileType.TBox;
-            }
-            if (axiomFileFullPath.toLowerCase().contains("abox")) {
-                targetModel = this.aBoxFacts;
-                axiomFileType = AxiomFileType.ABox;
-            }
-            if (axiomFileFullPath.toLowerCase().contains("rbox")) {
-                targetModel = this.rBoxProperties;
-                axiomFileType = AxiomFileType.RBox;
-            }
-            if (targetModel == null) {
-                log.error("No target model chosen!");
-            }
-            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, ipfsHelpers, axiomFileFullPath, axiomFileType, ethereumHelpers, targetModel);
+            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, ipfsHelpers, axiomFileFullPath, ethereumHelpers);
         }
 
     }
 
     private Boolean executeSPARQLSelectQuery(String SPARQLSelectLocation) {
+        dataset.begin(ReadWrite.READ);
         Query query = QueryFactory.read(SPARQLSelectLocation);
+
         QueryExecution queryExec = QueryExecutionFactory.create(query, this.model);
         try {
             ResultSet results = queryExec.execSelect();
@@ -238,28 +235,56 @@ public class JenaHelpers {
         }  finally {
             queryExec.close();
         }
+        dataset.end();
         return true;
     }
 
     // TODO: decide how you are going to split operations on abox, tbox. Can't do updates on UnionGraph
-    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, IPFSHelpers ipfsHelpers, String axiomFileFullPath, AxiomFileType axiomFileType, EthereumHelpers ethereumHelpers, Model targetModel) {
+    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, IPFSHelpers ipfsHelpers, String axiomFileFullPath, EthereumHelpers ethereumHelpers) {
+        AxiomFileType axiomFileType = null;
+        Model toUpdate = null;
+        if (axiomFileFullPath.toLowerCase().contains("tbox")) {
+            axiomFileType = AxiomFileType.TBox;
+            toUpdate = this.tBoxSchema;
+        }
+        if (axiomFileFullPath.toLowerCase().contains("abox")) {
+            axiomFileType = AxiomFileType.ABox;
+            toUpdate = this.aBoxFacts;
+        }
+        if (axiomFileFullPath.toLowerCase().contains("rbox")) {
+            axiomFileType = AxiomFileType.RBox;
+            toUpdate = this.rBoxProperties;
+        }
+        if (axiomFileType == null) {
+            log.severe("No axiomFileType chosen!");
+        }
+        String namedModelName = axiomFileType.name().toLowerCase();
 
-        UpdateRequest request = UpdateFactory.create() ;
-        UpdateAction.readExecute(locationOfSPARQL, targetModel) ;
-        UpdateAction.execute(request, targetModel);
+        dataset.begin(ReadWrite.WRITE);
+        UpdateRequest request = UpdateFactory.create();
+        UpdateAction.readExecute(locationOfSPARQL, toUpdate);
+        UpdateAction.execute(request, toUpdate);
 
         if (this.useReasoner) {
-            if (isOntologyConsistent(axiomFileType, targetModel)) {
-                log.debug("Changes were executed");
-                uploadChangesToBlockchains(axiomFileFullPath, axiomFileType, targetModel, ipfsHelpers, ethereumHelpers);
+            if (isOntologyConsistent(axiomFileType, toUpdate)) {
+                log.fine("Changes were executed");
+                uploadChangesToBlockchains(axiomFileFullPath, axiomFileType, toUpdate, ipfsHelpers, ethereumHelpers);
+                dataset.commit();
                 return true;
             } else {
-                log.error("Changes were not made because ontology would be no longer consistent");
+                log.severe("Changes were not made because ontology would be no longer consistent");
+                dataset.abort();
+                dataset.end();
+                return false;
             }
-            return false;
         }
-        log.debug("Changes were executed");
-        uploadChangesToBlockchains(axiomFileFullPath, axiomFileType, targetModel, ipfsHelpers, ethereumHelpers);
+        dataset.commit();
+        log.fine("Changes were commited");
+
+        dataset.begin(ReadWrite.READ);
+        //toUpdate = dataset.getNamedModel(namedModelName);
+        uploadChangesToBlockchains(axiomFileFullPath, axiomFileType, toUpdate, ipfsHelpers, ethereumHelpers);
+        dataset.end();
         return true;
 
     }
@@ -286,6 +311,8 @@ public class JenaHelpers {
     }
 
     public void printDatasetToStandardOutput() {
-        RDFDataMgr.write(System.out, this.model, RDFFormat.TURTLE) ;
+        dataset.begin(ReadWrite.READ);
+        RDFDataMgr.write(System.out, this.model, RDFFormat.TURTLE);
+        dataset.end();
     }
 }

@@ -35,9 +35,9 @@ In order to connect to other Ethereum node change ethereum/nodeAddress in config
 [tdbloader](https://jena.apache.org/documentation/tdb/commands.html#installation)
 Load toy ontology 
 ```bash
-tdbloader --graph=abox --loc ./target/dataset ./ipfs-files/output/abox-axioms.ttl
-tdbloader --graph=tbox --loc ./target/dataset ./ipfs-files/output/tbox-axioms.ttl
-tdbloader --graph=rbox --loc ./target/dataset ./ipfs-files/output/rbox-axioms.ttl
+tdb2.tdbloader --graph=abox --loc ./target/dataset ./ipfs-files/output/abox-axioms.ttl
+tdb2.tdbloader --graph=tbox --loc ./target/dataset ./ipfs-files/output/tbox-axioms.ttl
+tdb2.tdbloader --graph=rbox --loc ./target/dataset ./ipfs-files/output/rbox-axioms.ttl
 ```
 or subset of DBpedia
 ```bash

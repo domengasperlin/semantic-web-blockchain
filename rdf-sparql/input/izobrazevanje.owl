@@ -125,8 +125,8 @@
 #    Individuals
 #################################################################
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Drugi_Letnik
-:Drugi_Letnik rdf:type owl:NamedIndividual ,
+###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Drugi_letnik
+:Drugi_letnik rdf:type owl:NamedIndividual ,
                        :Letnik .
 
 

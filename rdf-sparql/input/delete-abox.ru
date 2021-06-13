@@ -6,5 +6,5 @@ prefix xsd: <http://www.w3.org/2001/XMLSchema#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 DELETE DATA
 {
-  :Janez_Novak :jeVpisan :Prvi_Letnik .
+  :Janez_Novak :jeVpisan :Prvi_letnik .
 }

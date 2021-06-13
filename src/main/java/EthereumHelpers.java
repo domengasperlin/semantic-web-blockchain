@@ -1,6 +1,4 @@
 import contracts.Storage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
@@ -8,8 +6,8 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Convert;
-
 import java.math.BigInteger;
+import java.util.logging.Logger;
 
 public class EthereumHelpers {
     Web3j web3;
@@ -17,7 +15,7 @@ public class EthereumHelpers {
     private BigInteger gasLimit;
     private BigInteger gasPrice;
     Storage storageContract;
-    private static final Logger log = LoggerFactory.getLogger(EthereumHelpers.class);
+    private static final Logger log = Logger.getLogger(EthereumHelpers.class.getName());
     public EthereumHelpers(String ethereumNodeAddress, Boolean useGanacheSpecificGasPriceGasLimit) {
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
         if (useGanacheSpecificGasPriceGasLimit) {
@@ -55,7 +53,7 @@ public class EthereumHelpers {
                 e.printStackTrace();
             }
         } else {
-            log.error("Error fetching a wallet!");
+            log.severe("Error fetching a wallet!");
         }
     }
 

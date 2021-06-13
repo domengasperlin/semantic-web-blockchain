@@ -6,179 +6,101 @@
 @base <http://www.w3.org/2002/07/owl#> .
 
 [ rdf:type owl:Ontology
-] .
-
+ ] .
 
 #################################################################
-#
 #    Object Properties
-#
 #################################################################
-
-
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaPredavatelja
-
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaPredavatelja> rdf:type owl:ObjectProperty ;
-                                                                                   
-                                                                                   owl:inverseOf <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava> .
-
-
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan> rdf:type owl:ObjectProperty ,
-                                                                                     owl:FunctionalProperty ,
-                                                                                     owl:AsymmetricProperty ;
-                                                                            
+                                                                                     owl:FunctionalProperty ;
                                                                             rdfs:domain <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> ;
-                                                                            
                                                                             rdfs:range <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik> .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeČlanica
-
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeČlanica> rdf:type owl:ObjectProperty ,
-                                                                                      owl:ReflexiveProperty ;
-                                                                             
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeČlanica> rdf:type owl:ObjectProperty ;
                                                                              rdfs:domain <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> ;
-                                                                             
                                                                              rdfs:range <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza> .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje
-
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje> rdf:type owl:ObjectProperty ,
-                                                                                     owl:AsymmetricProperty ;
-                                                                            
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje> rdf:type owl:ObjectProperty ;
                                                                             rdfs:domain <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> ;
-                                                                            
                                                                             rdfs:range <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava
-
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava> rdf:type owl:ObjectProperty ,
-                                                                                    owl:AsymmetricProperty ;
-                                                                           
+<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava> rdf:type owl:ObjectProperty ;
                                                                            rdfs:domain <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor> ;
-                                                                           
                                                                            rdfs:range <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja> rdf:type owl:ObjectProperty ;
-                                                                            
                                                                             rdfs:domain <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> ;
-                                                                            
                                                                             rdfs:range <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> .
 
 
-
-
-
 #################################################################
-#
 #    Data properties
-#
 #################################################################
-
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisnoŠtevilko
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisnoŠtevilko> rdf:type owl:DatatypeProperty ;
-                                                                                     
                                                                                      rdfs:domain <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> ;
-                                                                                     
                                                                                      rdfs:range xsd:integer .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeBruc
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeBruc> rdf:type owl:DatatypeProperty ;
-                                                                          
                                                                           rdfs:domain <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> ;
-                                                                          
                                                                           rdfs:range xsd:boolean .
 
 
-
-
-
 #################################################################
-#
 #    Classes
-#
 #################################################################
-
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski> rdf:type owl:Class ;
-                                                                               
                                                                                rdfs:subClassOf <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> .
-
 
 
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta> rdf:type owl:Class ;
-                                                                             
                                                                              rdfs:subClassOf <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza> .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik> rdf:type owl:Class .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski> rdf:type owl:Class ;
-                                                                               
                                                                                rdfs:subClassOf <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet> rdf:type owl:Class .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor> rdf:type owl:Class ;
-                                                                            
                                                                             owl:disjointWith <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza> rdf:type owl:Class .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent> rdf:type owl:Class .
 
 
-
 ###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij
-
 <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij> rdf:type owl:Class .
 
 
-
-
-###  Generated by the OWL API (version 4.1.3.20151118-2017) https://github.com/owlcs/owlapi
-
+###  Generated by the OWL API (version 5.1.17.2020-11-07T15:03:35Z) https://github.com/owlcs/owlapi/
