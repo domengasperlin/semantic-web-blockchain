@@ -66,8 +66,8 @@ class ABoxListener extends StatementListener {
 
 public class JenaHelpers {
     private static String datasetLocation = "target/dataset";
-    Dataset dataset;
     private static Boolean useReasoner;
+    Dataset dataset;
     private Model model;
     private Model tBoxSchema;
     private Model aBoxFacts;
@@ -75,6 +75,7 @@ public class JenaHelpers {
 
     private static final Logger log = Logger.getLogger(JenaHelpers.class.getName());
     public JenaHelpers(String tBoxFileName, String aBoxFileName, String rBoxFileName, Boolean useReasoner) {
+        this.useReasoner = useReasoner;
         log.setLevel(Level.FINE);
         FileManager fm = FileManager.get();
         // https://jena.apache.org/documentation/tdb/datasets.html set default graph as union of named graphs, TODO: check this
@@ -87,47 +88,43 @@ public class JenaHelpers {
         Boolean containsRBox = dataset.containsNamedModel("rbox");
         dataset.end();
 
-        if (!containsTBox) {
+        if (!containsTBox && tBoxFileName != null) {
             dataset.begin(ReadWrite.WRITE);
             fm.readModel(dataset.getNamedModel("tbox"), tBoxFileName);
             dataset.commit();
         }
-        this.tBoxSchema = dataset.getNamedModel("tbox");
-        if (!containsABox) {
+        if (!containsABox && aBoxFileName != null) {
             dataset.begin(ReadWrite.WRITE);
             fm.readModel(dataset.getNamedModel("abox"), aBoxFileName);
             dataset.commit();
         }
-        this.aBoxFacts = dataset.getNamedModel("abox");
-        if (!containsRBox) {
+        if (!containsRBox && rBoxFileName != null) {
             dataset.begin(ReadWrite.WRITE);
             fm.readModel(dataset.getNamedModel("rbox"), rBoxFileName);
             dataset.commit();
         }
-        this.rBoxProperties = dataset.getNamedModel("rbox");
 
         dataset.begin(ReadWrite.READ);
+        this.tBoxSchema = dataset.getNamedModel("tbox");
+        this.aBoxFacts = dataset.getNamedModel("abox");
+        this.rBoxProperties = dataset.getNamedModel("rbox");
+        this.model = dataset.getUnionModel();
+
         ModelChangedListener tBoxChangedListener = new TBoxListener();
         this.tBoxSchema.register(tBoxChangedListener);
-
         ModelChangedListener rBoxChangedListener = new RBoxListener();
         this.rBoxProperties.register(rBoxChangedListener);
-
         ModelChangedListener aBoxChangedListener = new ABoxListener();
         this.aBoxFacts.register(aBoxChangedListener);
 
-        this.model = dataset.getUnionModel();
-        this.useReasoner = useReasoner;
         if (useReasoner) {
             if (isOntologyConsistent(AxiomFileType.ABox, this.aBoxFacts)) {
-                dataset.commit();
+                log.fine("Ontology is consistent");
             } else {
-                dataset.abort();
-                log.severe( "Ontology was not committed because it is not consistent!");
+                log.severe( "Ontology is not consistent!");
             }
-        } else {
-            dataset.commit();
         }
+        dataset.end();
     }
 
     public Boolean isOntologyConsistent(AxiomFileType axiomFileType, Model targetModel) {

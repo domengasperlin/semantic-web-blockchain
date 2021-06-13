@@ -1,6 +1,7 @@
 import io.ipfs.api.IPFS;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -8,6 +9,7 @@ public class Demo {
     private static final Logger log = Logger.getLogger(Demo.class.getName());
     public static Boolean uploadLocalDatabaseToBlockchains = true;
     public static Boolean useReasoner = true;
+    public static Boolean performOntologySplit = true;
 
     public static void main(String[] args) {
         ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
@@ -27,11 +29,13 @@ public class Demo {
         String tBoxFullPath = configLoader.getTBoxFilePath();
         String rBoxFullPath = configLoader.getRBoxFilePath();
         if (uploadLocalDatabaseToBlockchains) {
-            // Separate ontology to axiom files
-            OntologyHelpers ontologyHelpers = new OntologyHelpers(inputOntologyFiles);
-            ontologyHelpers.saveABoxAxiomsToFile(aBoxFullPath);
-            ontologyHelpers.saveTBoxAxiomsToFile(tBoxFullPath);
-            ontologyHelpers.saveRBoxAxiomsToFile(rBoxFullPath);
+            if (performOntologySplit) {
+                // Separate ontology to axiom files
+                OntologyHelpers ontologyHelpers = new OntologyHelpers(inputOntologyFiles);
+                ontologyHelpers.saveABoxAxiomsToFile(aBoxFullPath);
+                ontologyHelpers.saveTBoxAxiomsToFile(tBoxFullPath);
+                ontologyHelpers.saveRBoxAxiomsToFile(tBoxFullPath);
+            }
 
             // Upload ABox, TBox, RBox files to IPFS
             aBoxCID = ipfsHelpers.uploadLocalFileToIPFS(aBoxFullPath).toString();
