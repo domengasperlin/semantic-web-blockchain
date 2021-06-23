@@ -258,9 +258,7 @@ public class JenaHelpers {
         String namedModelName = axiomFileType.name().toLowerCase();
 
         dataset.begin(ReadWrite.WRITE);
-        UpdateRequest request = UpdateFactory.create();
         UpdateAction.readExecute(locationOfSPARQL, toUpdate);
-        UpdateAction.execute(request, toUpdate);
 
         if (this.useReasoner) {
             if (isOntologyConsistent(axiomFileType, toUpdate)) {
