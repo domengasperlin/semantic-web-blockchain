@@ -9,9 +9,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.tdb2.TDB2;
 import org.apache.jena.tdb2.TDB2Factory;
-import org.apache.jena.update.UpdateAction;
-import org.apache.jena.update.UpdateFactory;
-import org.apache.jena.update.UpdateRequest;
+import org.apache.jena.update.*;
 import org.apache.jena.util.FileManager;
 
 import java.io.File;
@@ -67,7 +65,7 @@ class ABoxListener extends StatementListener {
 public class JenaHelpers {
     private static String datasetLocation = "target/dataset";
     private static Boolean useReasoner;
-    Dataset dataset;
+    private Dataset dataset;
     private Model model;
     private Model tBoxSchema;
     private Model aBoxFacts;
@@ -110,12 +108,14 @@ public class JenaHelpers {
         this.rBoxProperties = dataset.getNamedModel("rbox");
         this.model = dataset.getUnionModel();
 
-        ModelChangedListener tBoxChangedListener = new TBoxListener();
-        this.tBoxSchema.register(tBoxChangedListener);
-        ModelChangedListener rBoxChangedListener = new RBoxListener();
-        this.rBoxProperties.register(rBoxChangedListener);
-        ModelChangedListener aBoxChangedListener = new ABoxListener();
-        this.aBoxFacts.register(aBoxChangedListener);
+        if (!tBoxFileName.contains("dbpedia")) {
+            ModelChangedListener tBoxChangedListener = new TBoxListener();
+            this.tBoxSchema.register(tBoxChangedListener);
+            ModelChangedListener rBoxChangedListener = new RBoxListener();
+            this.rBoxProperties.register(rBoxChangedListener);
+            ModelChangedListener aBoxChangedListener = new ABoxListener();
+            this.aBoxFacts.register(aBoxChangedListener);
+        }
 
         if (useReasoner) {
             if (isOntologyConsistent(AxiomFileType.ABox, this.aBoxFacts)) {
