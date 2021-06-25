@@ -1,6 +1,5 @@
 import io.ipfs.api.IPFS;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -10,7 +9,7 @@ public class Demo {
     public static Boolean useReasoner;
     public static Boolean performOntologySplit;
 
-    public static Boolean isInitialLoad = false;
+    public static Boolean isInitialLoad = true;
 
     public static void main(String[] args) {
         ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
@@ -69,8 +68,16 @@ public class Demo {
 
         } else {
             // Download dataset from blockchain
-            String smartContractAddress = "0x0c3b4bfbc2bead8defb3a3217ee77a34a7a9b2d4";
+            String smartContractAddress = "0x453927128d29ddf47eb55bd557e6445807ccb849";
             ethereumHelpers.loadContractAtAddress(smartContractAddress);
+            String sparqlUpdateCID = null;
+            try {
+                sparqlUpdateCID = ethereumHelpers.getContract().getSparqlUpdate().send();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ipfsHelpers.retrieveFileAndSaveItToLocalSystem(sparqlUpdateCID, "ipfs-files/output/sparql-update-"+sparqlUpdateCID+".ru");
+
             String[] contractCIDs = ethereumHelpers.callRetrieveTBoxABoxRBoxMethods();
             tBoxCID = contractCIDs[0];
             aBoxCID = contractCIDs[1];
@@ -82,7 +89,9 @@ public class Demo {
         }
 
         // Load the ABox, TBox, RBox files into the Apache Jena
-        JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath, rBoxFullPath, useReasoner);
+        JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath, rBoxFullPath, useReasoner, isInitialLoad);
+        // TODO: support more than one migration
+        jenaHelpers.executeSPARQLMigrationForDBSync("ipfs-files/output/sparql-update.ru");
 
         for (String query : SPARQLQueries) {
             log.info("[Executing SPARQL from query file (.rq)] " + query);

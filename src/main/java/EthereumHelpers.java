@@ -99,6 +99,10 @@ public class EthereumHelpers {
         return new String[]{tBoxCID, aBoxCID,rBoxCID};
     }
 
+    public Storage getContract() {
+        return this.storageContract;
+    }
+
     public void updateTBoxInContract(String tBox) {
         try {
             this.storageContract.setTBox(tBox).send();

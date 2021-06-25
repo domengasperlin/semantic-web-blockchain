@@ -5,6 +5,8 @@ contract Storage {
     string tBox;
     string aBox;
     string rBox;
+    string sparqlUpdate;
+    string[] public migrations;
 
     function storeTBoxABoxRBox(string memory _tBox, string memory _aBox, string memory _rBox) public {
         tBox = _tBox;
@@ -34,5 +36,19 @@ contract Storage {
 
     function setRBox(string memory _rBox) public {
         rBox = _rBox;
+    }
+
+    function setSparqlUpdate(string memory _sparqlUpdate) public {
+        sparqlUpdate = _sparqlUpdate;
+        migrations.push(_sparqlUpdate);
+    }
+
+    function getSparqlUpdate() public view returns (string memory) {
+        return sparqlUpdate;
+    }
+
+    function getSparqlUpdateMigrations() public view returns (string[] memory) {
+        // TODO: fix deserialization to support more than one migration
+        return migrations;
     }
 }

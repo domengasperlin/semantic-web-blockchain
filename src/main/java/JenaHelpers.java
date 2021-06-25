@@ -7,14 +7,14 @@ import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.reasoner.ValidityReport;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.system.Txn;
 import org.apache.jena.tdb2.TDB2;
 import org.apache.jena.tdb2.TDB2Factory;
-import org.apache.jena.update.*;
+import org.apache.jena.update.UpdateAction;
 import org.apache.jena.util.FileManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -65,6 +65,7 @@ class ABoxListener extends StatementListener {
 public class JenaHelpers {
     private static String datasetLocation = "target/dataset";
     private static Boolean useReasoner;
+    private static Boolean isInitialLoad;
     private Dataset dataset;
     private Model model;
     private Model tBoxSchema;
@@ -72,7 +73,8 @@ public class JenaHelpers {
     private Model rBoxProperties;
 
     private static final Logger log = Logger.getLogger(JenaHelpers.class.getName());
-    public JenaHelpers(String tBoxFileName, String aBoxFileName, String rBoxFileName, Boolean useReasoner) {
+    public JenaHelpers(String tBoxFileName, String aBoxFileName, String rBoxFileName, Boolean useReasoner, Boolean isInitialLoad) {
+        this.isInitialLoad = isInitialLoad;
         this.useReasoner = useReasoner;
         log.setLevel(Level.FINE);
         FileManager fm = FileManager.get();
@@ -87,19 +89,13 @@ public class JenaHelpers {
         dataset.end();
 
         if (!containsTBox && tBoxFileName != null) {
-            dataset.begin(ReadWrite.WRITE);
-            fm.readModel(dataset.getNamedModel("tbox"), tBoxFileName);
-            dataset.commit();
+            Txn.executeWrite(dataset, () -> fm.readModel(dataset.getNamedModel("tbox"), tBoxFileName) );
         }
         if (!containsABox && aBoxFileName != null) {
-            dataset.begin(ReadWrite.WRITE);
-            fm.readModel(dataset.getNamedModel("abox"), aBoxFileName);
-            dataset.commit();
+            Txn.executeWrite(dataset, () -> fm.readModel(dataset.getNamedModel("abox"), aBoxFileName));
         }
         if (!containsRBox && rBoxFileName != null) {
-            dataset.begin(ReadWrite.WRITE);
-            fm.readModel(dataset.getNamedModel("rbox"), rBoxFileName);
-            dataset.commit();
+            Txn.executeWrite(dataset, () -> fm.readModel(dataset.getNamedModel("rbox"), rBoxFileName));
         }
 
         dataset.begin(ReadWrite.READ);
@@ -195,14 +191,15 @@ public class JenaHelpers {
     public Boolean executeSPARQL(String SPARQLQueryFileLocation, String axiomFileFullPath, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         File file = new File(SPARQLQueryFileLocation);
         Boolean executeSelect = false;
+        String sparqlQueryString = "";
         try {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                if (line.toLowerCase().contains("select")) {
-                    executeSelect = true;
-                    break;
-                }
+                sparqlQueryString += line;
+            }
+            if (sparqlQueryString.toLowerCase().contains("select")) {
+                executeSelect = true;
             }
         } catch(FileNotFoundException e) {
             e.printStackTrace();
@@ -210,7 +207,7 @@ public class JenaHelpers {
         if (executeSelect) {
             return executeSPARQLSelectQuery(SPARQLQueryFileLocation);
         } else {
-            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, ipfsHelpers, axiomFileFullPath, ethereumHelpers);
+            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, sparqlQueryString, ipfsHelpers, axiomFileFullPath, ethereumHelpers);
         }
 
     }
@@ -237,7 +234,7 @@ public class JenaHelpers {
     }
 
     // TODO: decide how you are going to split operations on abox, tbox. Can't do updates on UnionGraph
-    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, IPFSHelpers ipfsHelpers, String axiomFileFullPath, EthereumHelpers ethereumHelpers) {
+    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, String sparqlString, IPFSHelpers ipfsHelpers, String axiomFileFullPath, EthereumHelpers ethereumHelpers) {
         AxiomFileType axiomFileType = null;
         Model toUpdate = null;
         if (axiomFileFullPath.toLowerCase().contains("tbox")) {
@@ -255,59 +252,73 @@ public class JenaHelpers {
         if (axiomFileType == null) {
             log.severe("No axiomFileType chosen!");
         }
-        String namedModelName = axiomFileType.name().toLowerCase();
 
         dataset.begin(ReadWrite.WRITE);
-        UpdateAction.readExecute(locationOfSPARQL, toUpdate);
+        UpdateAction.parseExecute(sparqlString, toUpdate);
+        dataset.commit();
 
+        dataset.begin(ReadWrite.READ);
         if (this.useReasoner) {
             if (isOntologyConsistent(axiomFileType, toUpdate)) {
-                log.fine("Changes were executed");
-                uploadChangesToBlockchains(axiomFileFullPath, axiomFileType, toUpdate, ipfsHelpers, ethereumHelpers);
-                dataset.commit();
+                uploadChangesToBlockchains(axiomFileFullPath, locationOfSPARQL, axiomFileType, toUpdate, ipfsHelpers, ethereumHelpers);
+                dataset.end();
                 return true;
             } else {
-                log.severe("Changes were not made because ontology would be no longer consistent");
-                dataset.abort();
+                log.severe("Ontology is no longer consistent");
                 dataset.end();
                 return false;
             }
         }
-        dataset.commit();
-        log.fine("Changes were commited");
 
-        dataset.begin(ReadWrite.READ);
-        //toUpdate = dataset.getNamedModel(namedModelName);
-        uploadChangesToBlockchains(axiomFileFullPath, axiomFileType, toUpdate, ipfsHelpers, ethereumHelpers);
+        uploadChangesToBlockchains(axiomFileFullPath, locationOfSPARQL, axiomFileType, toUpdate, ipfsHelpers, ethereumHelpers);
         dataset.end();
         return true;
 
     }
 
-    public void uploadChangesToBlockchains(String axiomFileFullPath, AxiomFileType axiomFileType, Model targetModel, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+    public void uploadChangesToBlockchains(String axiomFileFullPath, String locationOfSparql, AxiomFileType axiomFileType, Model targetModel, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+        // If it is initial load then save CIDS of axiom files to the IPFS
+        if (isInitialLoad) {
+            String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(axiomFileFullPath).toString();
+
+            try {
+                if (axiomFileType == AxiomFileType.TBox) {
+                    ethereumHelpers.getContract().setTBox(xBoxCID).send();
+                }
+                if (axiomFileType == AxiomFileType.ABox) {
+                    ethereumHelpers.getContract().setABox(xBoxCID).send();
+                }
+                if (axiomFileType == AxiomFileType.RBox) {
+                    ethereumHelpers.getContract().setRBox(xBoxCID).send();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            isInitialLoad = false;
+        }
+
+        String sparqlQueryCID = ipfsHelpers.uploadLocalFileToIPFS(locationOfSparql).toString();
         try {
-            RDFDataMgr.write(new FileOutputStream(axiomFileFullPath), targetModel, RDFFormat.TURTLE);
-        } catch (FileNotFoundException e) {
+            ethereumHelpers.getContract().setSparqlUpdate(sparqlQueryCID).send();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(axiomFileFullPath).toString();
-
-        if (axiomFileType == AxiomFileType.TBox) {
-            ethereumHelpers.updateTBoxInContract(xBoxCID);
-        }
-        if (axiomFileType == AxiomFileType.ABox) {
-            ethereumHelpers.updateABoxInContract(xBoxCID);
-        }
-        if (axiomFileType == AxiomFileType.RBox) {
-            ethereumHelpers.updateRBoxInContract(xBoxCID);
-        }
-
     }
 
     public void printDatasetToStandardOutput() {
         dataset.begin(ReadWrite.READ);
         RDFDataMgr.write(System.out, this.model, RDFFormat.TURTLE);
         dataset.end();
+    }
+
+    public void executeSPARQLMigrationForDBSync(String locationOfSparql) {
+        File f = new File(locationOfSparql);
+        if(f.exists() && !f.isDirectory()) {
+            dataset.begin(ReadWrite.WRITE);
+            log.info("[Executing SPARQL migration from query file (.rq)] " + locationOfSparql);
+            UpdateAction.readExecute(locationOfSparql, dataset);
+            dataset.commit();
+        }
+        log.fine("Update file doesn't exist on initial db uplaod");
     }
 }
