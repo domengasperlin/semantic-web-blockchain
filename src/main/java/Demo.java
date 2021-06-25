@@ -1,15 +1,16 @@
 import io.ipfs.api.IPFS;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 public class Demo {
     private static final Logger log = Logger.getLogger(Demo.class.getName());
-    public static Boolean uploadLocalDatabaseToBlockchains = true;
-    public static Boolean useReasoner = true;
-    public static Boolean performOntologySplit = true;
+    public static Boolean uploadLocalDatabaseToBlockchains;
+    public static Boolean useReasoner;
+    public static Boolean performOntologySplit;
+
+    public static Boolean isInitialLoad = false;
 
     public static void main(String[] args) {
         ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
@@ -17,6 +18,22 @@ public class Demo {
         String IPFSNodeAddress = (String) configLoader.getIPFS().get("nodeAddress");
         String ethereumNodeAddress = (String) configLoader.getEthereum().get("nodeAddress");
         ArrayList<String> SPARQLQueries = (ArrayList<String>) configLoader.getOntology().get("SPARQLQueries");
+
+        if (isInitialLoad) {
+            performOntologySplit = true;
+            uploadLocalDatabaseToBlockchains = true;
+        } else {
+            performOntologySplit = false;
+            uploadLocalDatabaseToBlockchains = false;
+        }
+        for(String x : SPARQLQueries){
+            if(x.contains("dbpedia")){
+                useReasoner = false;
+                break;
+            } else {
+                useReasoner = true;
+            }
+        }
 
         EthereumHelpers ethereumHelpers = new EthereumHelpers(ethereumNodeAddress, configLoader.isDevelopment());
         ethereumHelpers.loadWalletCredentials(configLoader);
