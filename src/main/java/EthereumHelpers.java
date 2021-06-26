@@ -2,10 +2,10 @@ import contracts.Storage;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Convert;
+
 import java.math.BigInteger;
 import java.util.logging.Logger;
 
@@ -16,15 +16,17 @@ public class EthereumHelpers {
     private BigInteger gasPrice;
     Storage storageContract;
     private static final Logger log = Logger.getLogger(EthereumHelpers.class.getName());
-    public EthereumHelpers(String ethereumNodeAddress, Boolean useGanacheSpecificGasPriceGasLimit) {
+    public EthereumHelpers(String ethereumNodeAddress, ConfigLoader configLoader) {
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
-        if (useGanacheSpecificGasPriceGasLimit) {
+        if (configLoader.isDevelopment()) {
+            // Ganache specific
             gasLimit = BigInteger.valueOf(6721975);
             gasPrice = Convert.toWei("20000000000", Convert.Unit.WEI).toBigInteger();
         } else {
             gasLimit = new DefaultGasProvider().getGasLimit();
             gasPrice = new DefaultGasProvider().getGasPrice();
         }
+        loadWalletCredentials(configLoader);
     }
 
     public void loadContractAtAddress(String contractAddress) {
@@ -68,62 +70,7 @@ public class EthereumHelpers {
         return helloWorld.getContractAddress();
     }
 
-    public TransactionReceipt callStoreMethodOfContract(String tBoxCID, String aBoxCID, String rBoxCID) {
-        TransactionReceipt storedTransactionReceipt = null;
-        try {
-            if (this.storageContract.isValid()) {
-//                File file = new File(fileToBeStoredName);
-//                String content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                storedTransactionReceipt = this.storageContract.storeTBoxABoxRBox(tBoxCID, aBoxCID, rBoxCID).send();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return storedTransactionReceipt;
-    }
-
-    public String[] callRetrieveTBoxABoxRBoxMethods() {
-        String tBoxCID = null;
-        String aBoxCID = null;
-        String rBoxCID = null;
-        try {
-            if (this.storageContract.isValid()) {
-                tBoxCID = this.storageContract.getTBox().send();
-                aBoxCID = this.storageContract.getABox().send();
-                rBoxCID = this.storageContract.getRBox().send();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return new String[]{tBoxCID, aBoxCID,rBoxCID};
-    }
-
     public Storage getContract() {
         return this.storageContract;
-    }
-
-    public void updateTBoxInContract(String tBox) {
-        try {
-            this.storageContract.setTBox(tBox).send();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updateABoxInContract(String ABox) {
-        try {
-            this.storageContract.setABox(ABox).send();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updateRBoxInContract(String RBox) {
-        try {
-            this.storageContract.setRBox(RBox).send();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -7,7 +7,6 @@ public class Demo {
     private static final Logger log = Logger.getLogger(Demo.class.getName());
     public static Boolean uploadLocalDatabaseToBlockchains;
     public static Boolean useReasoner;
-    public static Boolean performOntologySplit;
 
     public static Boolean isInitialLoad = true;
 
@@ -19,10 +18,8 @@ public class Demo {
         ArrayList<String> SPARQLQueries = (ArrayList<String>) configLoader.getOntology().get("SPARQLQueries");
 
         if (isInitialLoad) {
-            performOntologySplit = true;
             uploadLocalDatabaseToBlockchains = true;
         } else {
-            performOntologySplit = false;
             uploadLocalDatabaseToBlockchains = false;
         }
         for(String x : SPARQLQueries){
@@ -34,43 +31,34 @@ public class Demo {
             }
         }
 
-        EthereumHelpers ethereumHelpers = new EthereumHelpers(ethereumNodeAddress, configLoader.isDevelopment());
-        ethereumHelpers.loadWalletCredentials(configLoader);
+        EthereumHelpers ethereumHelpers = new EthereumHelpers(ethereumNodeAddress, configLoader);
         IPFSHelpers ipfsHelpers = new IPFSHelpers(new IPFS(IPFSNodeAddress));
 
-        String aBoxCID;
-        String tBoxCID;
-        String rBoxCID;
-        String aBoxFullPath = configLoader.getABoxFilePath();
-        String tBoxFullPath = configLoader.getTBoxFilePath();
-        String rBoxFullPath = configLoader.getRBoxFilePath();
+        String inputOntologyCID = null;
+        // TODO: support more input ontology files
+        String inputOntologyPath = inputOntologyFiles.get(0);
+        String sparqlUpdateCID = null;
         if (uploadLocalDatabaseToBlockchains) {
-            if (performOntologySplit) {
-                // Separate ontology to axiom files
-                OntologyHelpers ontologyHelpers = new OntologyHelpers(inputOntologyFiles);
-                ontologyHelpers.saveABoxAxiomsToFile(aBoxFullPath);
-                ontologyHelpers.saveTBoxAxiomsToFile(tBoxFullPath);
-                ontologyHelpers.saveRBoxAxiomsToFile(tBoxFullPath);
-            }
-
             // Upload ABox, TBox, RBox files to IPFS
-            aBoxCID = ipfsHelpers.uploadLocalFileToIPFS(aBoxFullPath).toString();
-            tBoxCID = ipfsHelpers.uploadLocalFileToIPFS(tBoxFullPath).toString();
-            rBoxCID = ipfsHelpers.uploadLocalFileToIPFS(rBoxFullPath).toString();
-            log.info("[IPFS upload content identifiers] " + aBoxCID + " " + tBoxCID + " " + rBoxCID);
+            inputOntologyCID = ipfsHelpers.uploadLocalFileToIPFS(inputOntologyPath).toString();
+            log.info("[IPFS upload content identifiers] " + inputOntologyCID);
 
             // Store IPFS content identifiers to Ethereum
             String contractAddress = ethereumHelpers.deployStorageContract();
             log.info("[ETH] contract address: " + contractAddress);
             ethereumHelpers.loadContractAtAddress(contractAddress);
-            TransactionReceipt storeTransactionReceipt = ethereumHelpers.callStoreMethodOfContract(tBoxCID, aBoxCID, rBoxCID);
-            log.info("[ETH] transaction: " + storeTransactionReceipt.getTransactionHash());
+            TransactionReceipt send;
+            try {
+                send = ethereumHelpers.getContract().setInitialOntology(inputOntologyCID).send();
+                log.info("[ETH] transaction: " + send.getTransactionHash());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         } else {
             // Download dataset from blockchain
-            String smartContractAddress = "0x453927128d29ddf47eb55bd557e6445807ccb849";
+            String smartContractAddress = "0x7054c38b58770477d5d86bd6c10dc516042c2622";
             ethereumHelpers.loadContractAtAddress(smartContractAddress);
-            String sparqlUpdateCID = null;
             try {
                 sparqlUpdateCID = ethereumHelpers.getContract().getSparqlUpdate().send();
             } catch (Exception e) {
@@ -78,35 +66,26 @@ public class Demo {
             }
             ipfsHelpers.retrieveFileAndSaveItToLocalSystem(sparqlUpdateCID, "ipfs-files/output/sparql-update-"+sparqlUpdateCID+".ru");
 
-            String[] contractCIDs = ethereumHelpers.callRetrieveTBoxABoxRBoxMethods();
-            tBoxCID = contractCIDs[0];
-            aBoxCID = contractCIDs[1];
-            rBoxCID = contractCIDs[2];
+            try {
+                inputOntologyCID = ethereumHelpers.getContract().getInitialOntology().send();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             log.info("[IPFS download and write to files] ");
-            ipfsHelpers.retrieveFileAndSaveItToLocalSystem(aBoxCID, aBoxFullPath);
-            ipfsHelpers.retrieveFileAndSaveItToLocalSystem(tBoxCID, tBoxFullPath);
-            ipfsHelpers.retrieveFileAndSaveItToLocalSystem(rBoxCID, rBoxFullPath);
+
+            // TODO: support more input ontology files
+            ipfsHelpers.retrieveFileAndSaveItToLocalSystem(inputOntologyCID, inputOntologyPath);
         }
 
         // Load the ABox, TBox, RBox files into the Apache Jena
-        JenaHelpers jenaHelpers = new JenaHelpers(tBoxFullPath, aBoxFullPath, rBoxFullPath, useReasoner, isInitialLoad);
+        JenaHelpers jenaHelpers = new JenaHelpers(inputOntologyPath, useReasoner, isInitialLoad);
         // TODO: support more than one migration
-        jenaHelpers.executeSPARQLMigrationForDBSync("ipfs-files/output/sparql-update.ru");
+        jenaHelpers.executeSPARQLMigrationForDBSync("ipfs-files/output/sparql-update-"+sparqlUpdateCID+".ru");
 
         for (String query : SPARQLQueries) {
             log.info("[Executing SPARQL from query file (.rq)] " + query);
-            if (query.contains("tbox")) {
-                Boolean successful = jenaHelpers.executeSPARQL(query, tBoxFullPath, ipfsHelpers, ethereumHelpers);
-                if (!successful) break;
-            }
-            if (query.contains("abox")) {
-                Boolean successful = jenaHelpers.executeSPARQL(query, aBoxFullPath, ipfsHelpers, ethereumHelpers);
-                if (!successful) break;
-            }
-            if (query.contains("rbox")) {
-                Boolean successful = jenaHelpers.executeSPARQL(query, rBoxFullPath, ipfsHelpers, ethereumHelpers);
-                if (!successful) break;
-            }
+            Boolean successful = jenaHelpers.executeSPARQL(query, inputOntologyPath, ipfsHelpers, ethereumHelpers);
+            if (!successful) break;
             // jenaHelpers.printDatasetToStandardOutput();
         }
     }
