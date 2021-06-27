@@ -12,6 +12,7 @@ import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.update.UpdateAction;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -40,7 +41,7 @@ public class JenaHelpers {
     private Model model;
 
     private static final Logger log = Logger.getLogger(JenaHelpers.class.getName());
-    public JenaHelpers(String inputOntologyFileName, Boolean useReasoner, Boolean isInitialLoad) {
+    public JenaHelpers(ArrayList<String> inputOntologyFiles, Boolean useReasoner, Boolean isInitialLoad) throws Exception {
         this.isInitialLoad = isInitialLoad;
         this.useReasoner = useReasoner;
         log.setLevel(Level.FINE);
@@ -50,10 +51,12 @@ public class JenaHelpers {
         Boolean isDataSetEmpty = dataset.isEmpty();
         dataset.end();
 
-        if (inputOntologyFileName != null && isDataSetEmpty) {
-            Txn.executeWrite(dataset, () -> {
-                RDFDataMgr.read(dataset, inputOntologyFileName) ;
-            });
+        if (isDataSetEmpty) {
+            for (String inputOntologyFileName : inputOntologyFiles) {
+                if (inputOntologyFileName != null) {
+                    Txn.executeWrite(dataset, () -> RDFDataMgr.read(dataset, inputOntologyFileName));
+                }
+            }
         }
 
         dataset.begin(ReadWrite.READ);
@@ -65,7 +68,8 @@ public class JenaHelpers {
             if (isOntologyConsistent(this.model)) {
                 log.info("Loaded ontology is consistent");
             } else {
-                log.severe( "Loaded ontology is not consistent!");
+                log.severe( "Loaded ontology is not consistent, fix it and try again!");
+                throw new Exception("Ontology is not consistent");
             }
         }
         dataset.end();
@@ -91,7 +95,7 @@ public class JenaHelpers {
         return true;
     }
 
-    public Boolean executeSPARQL(String SPARQLQueryFileLocation, String axiomFileFullPath, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+    public Boolean executeSPARQL(String SPARQLQueryFileLocation, ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         File file = new File(SPARQLQueryFileLocation);
         Boolean executeSelect = false;
         String sparqlQueryString = "";
@@ -110,7 +114,7 @@ public class JenaHelpers {
         if (executeSelect) {
             return executeSPARQLSelectQuery(SPARQLQueryFileLocation);
         } else {
-            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, sparqlQueryString, ipfsHelpers, axiomFileFullPath, ethereumHelpers);
+            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, sparqlQueryString, ipfsHelpers, inputOntologyFiles, ethereumHelpers);
         }
 
     }
@@ -136,7 +140,7 @@ public class JenaHelpers {
         return true;
     }
 
-    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, String sparqlString, IPFSHelpers ipfsHelpers, String axiomFileFullPath, EthereumHelpers ethereumHelpers) {
+    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, String sparqlString, IPFSHelpers ipfsHelpers, ArrayList<String> inputOntologyFiles, EthereumHelpers ethereumHelpers) {
         dataset.begin(ReadWrite.WRITE);
         UpdateAction.parseExecute(sparqlString, this.model);
 
@@ -148,29 +152,31 @@ public class JenaHelpers {
                 return false;
             }
         }
-        uploadChangesToBlockchains(axiomFileFullPath, locationOfSPARQL, ipfsHelpers, ethereumHelpers);
+        uploadChangesToBlockchains(inputOntologyFiles, locationOfSPARQL, ipfsHelpers, ethereumHelpers);
         dataset.commit();
         dataset.end();
         return true;
 
     }
 
-    public void uploadChangesToBlockchains(String axiomFileFullPath, String locationOfSparql, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+    public void uploadChangesToBlockchains(ArrayList<String> inputOntologyFiles, String locationOfSparql, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         // If it is initial load then save CIDS of axiom files to the IPFS
         if (isInitialLoad) {
-            String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(axiomFileFullPath).toString();
+            for (String inputOntologyFile : inputOntologyFiles) {
+                String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(inputOntologyFile).toString();
 
-            try {
-                ethereumHelpers.getContract().setInitialOntology(xBoxCID);
-            } catch (Exception e) {
-                e.printStackTrace();
+                try {
+                    ethereumHelpers.getContract().addInputOntology(xBoxCID);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             isInitialLoad = false;
         }
 
         String sparqlQueryCID = ipfsHelpers.uploadLocalFileToIPFS(locationOfSparql).toString();
         try {
-            ethereumHelpers.getContract().setSparqlUpdate(sparqlQueryCID).send();
+            ethereumHelpers.getContract().addSUPMigration(sparqlQueryCID).send();
         } catch (Exception e) {
             e.printStackTrace();
         }
