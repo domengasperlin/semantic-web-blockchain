@@ -1,9 +1,10 @@
 import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.listeners.StatementListener;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelChangedListener;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.reasoner.Reasoner;
+import org.apache.jena.reasoner.ReasonerRegistry;
+import org.apache.jena.reasoner.ValidityReport;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.system.Txn;
@@ -11,6 +12,7 @@ import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.update.UpdateAction;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,80 +62,34 @@ public class JenaHelpers {
         this.model.register(modelChangedListener);
 
         if (useReasoner) {
-            // TODO: implement reasoner
-//            if (isOntologyConsistent(AxiomFileType.ABox, this.aBoxFacts)) {
-//                log.fine("Ontology is consistent");
-//            } else {
-//                log.severe( "Ontology is not consistent!");
-//            }
+            if (isOntologyConsistent(this.model)) {
+                log.info("Loaded ontology is consistent");
+            } else {
+                log.severe( "Loaded ontology is not consistent!");
+            }
         }
         dataset.end();
     }
 
-//    public Boolean isOntologyConsistent(AxiomFileType axiomFileType, Model targetModel) {
-//        if (axiomFileType == AxiomFileType.ABox) {
-//            Reasoner reasonerTBox = ReasonerRegistry.getOWLReasoner().bindSchema(this.tBoxSchema);
-//
-//            InfModel infModelTBoxABox = ModelFactory.createInfModel(reasonerTBox, targetModel);
-//
-//            ValidityReport validityReportTBoxABox = infModelTBoxABox.validate();
-//            if ( !validityReportTBoxABox.isValid() ) {
-//                log.fine("Ontology TBoxABox is not consistent");
-//                Iterator<ValidityReport.Report> iter = validityReportTBoxABox.getReports();
-//                while ( iter.hasNext() ) {
-//                    ValidityReport.Report report = iter.next();
-//                    log.info(report.toString());
-//                }
-//                return false;
-//            } else {
-//                log.fine( "Ontology TBoxABox is consistent");
-//            }
-//
-//            Reasoner reasonerRBox = ReasonerRegistry.getOWLReasoner().bindSchema(this.rBoxProperties);
-//            InfModel infModelRBoxABox = ModelFactory.createInfModel(reasonerRBox, targetModel);
-//
-//            ValidityReport validityReportRBoxABox = infModelRBoxABox.validate();
-//            if ( !validityReportRBoxABox.isValid() ) {
-//                log.fine("Ontology RBoxABox is not consistent");
-//                Iterator<ValidityReport.Report> iter = validityReportRBoxABox.getReports();
-//                while ( iter.hasNext() ) {
-//                    ValidityReport.Report report = iter.next();
-//                    log.info(report.toString());
-//                }
-//                return false;
-//            } else {
-//                log.fine("Ontology RBoxABox is consistent");
-//            }
-//            return true;
-//        }
-//
-//
-//        Reasoner reasoner = ReasonerRegistry.getOWLReasoner().bindSchema(targetModel);
-//        InfModel infModelTBoxRBox = ModelFactory.createInfModel(reasoner, this.aBoxFacts);
-//
-//
-//        ValidityReport validityReport1 = infModelTBoxRBox.validate();
-//        if ( !validityReport1.isValid() ) {
-//            log.warning("Ontology "+axiomFileType+" is not consistent");
-//            Iterator<ValidityReport.Report> iter = validityReport1.getReports();
-//            while ( iter.hasNext() ) {
-//                ValidityReport.Report report = iter.next();
-//                log.info(report.toString());
-//            }
-//            return false;
-//        } else {
-//            log.fine("Ontology "+axiomFileType+" is consistent");
-//            if (axiomFileType == AxiomFileType.TBox) {
-//                return true;
-//            }
-//            if (axiomFileType == AxiomFileType.RBox) {
-//                return true;
-//            }
-//            log.severe("Unexpected state");
-//            return false;
-//        }
-//
-//    }
+    public Boolean isOntologyConsistent(Model targetModel) {
+        Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
+
+        InfModel infModel = ModelFactory.createInfModel(reasoner, targetModel);
+
+        ValidityReport validityReport = infModel.validate();
+        if ( !validityReport.isValid() ) {
+            log.fine("Ontology is not consistent");
+            Iterator<ValidityReport.Report> iter = validityReport.getReports();
+            while ( iter.hasNext() ) {
+                ValidityReport.Report report = iter.next();
+                log.info(report.toString());
+            }
+            return false;
+        } else {
+            log.fine( "Ontology is consistent");
+        }
+        return true;
+    }
 
     public Boolean executeSPARQL(String SPARQLQueryFileLocation, String axiomFileFullPath, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         File file = new File(SPARQLQueryFileLocation);
@@ -180,32 +136,26 @@ public class JenaHelpers {
         return true;
     }
 
-    // TODO: decide how you are going to split operations on abox, tbox. Can't do updates on UnionGraph
     private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, String sparqlString, IPFSHelpers ipfsHelpers, String axiomFileFullPath, EthereumHelpers ethereumHelpers) {
         dataset.begin(ReadWrite.WRITE);
         UpdateAction.parseExecute(sparqlString, this.model);
+
+        if (this.useReasoner) {
+            if (!isOntologyConsistent(this.model)) {
+                log.severe("Ontology would be no longer consistent if this query is applied to dataset, only consistent changes will be persisted.");
+                dataset.abort();
+                dataset.end();
+                return false;
+            }
+        }
+        uploadChangesToBlockchains(axiomFileFullPath, locationOfSPARQL, ipfsHelpers, ethereumHelpers);
         dataset.commit();
-
-        dataset.begin(ReadWrite.READ);
-//        if (this.useReasoner) {
-//            if (isOntologyConsistent(axiomFileType, toUpdate)) {
-//                uploadChangesToBlockchains(axiomFileFullPath, locationOfSPARQL, axiomFileType, toUpdate, ipfsHelpers, ethereumHelpers);
-//                dataset.end();
-//                return true;
-//            } else {
-//                log.severe("Ontology is no longer consistent");
-//                dataset.end();
-//                return false;
-//            }
-//        }
-
-        uploadChangesToBlockchains(axiomFileFullPath, locationOfSPARQL, this.model, ipfsHelpers, ethereumHelpers);
         dataset.end();
         return true;
 
     }
 
-    public void uploadChangesToBlockchains(String axiomFileFullPath, String locationOfSparql, Model targetModel, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+    public void uploadChangesToBlockchains(String axiomFileFullPath, String locationOfSparql, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         // If it is initial load then save CIDS of axiom files to the IPFS
         if (isInitialLoad) {
             String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(axiomFileFullPath).toString();
