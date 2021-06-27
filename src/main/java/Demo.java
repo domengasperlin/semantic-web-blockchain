@@ -1,5 +1,7 @@
 import io.ipfs.api.IPFS;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -44,7 +46,7 @@ public class Demo {
 
         } else {
             // Retrieve IPFS content identifiers from Ethereum
-            String smartContractAddress = "0x4b96cd131964d4cf79005aafe0def709b463d5be";
+            String smartContractAddress = "0x683b0b26a667f2697965b36088c8e545c9aa87aa";
             ethereumHelpers.loadContractAtAddress(smartContractAddress);
             inputOntologyCID = ethereumHelpers.getContract().getInitialOntology().send();
 
@@ -54,13 +56,15 @@ public class Demo {
             log.info("[IPFS download and write to files]");
 
             // Download SPARQL migrations
-            sparqlMigrationCID = ethereumHelpers.getContract().getSparqlUpdate().send();
-            ipfsHelpers.retrieveFileAndSaveItToLocalSystem(sparqlMigrationCID, sparqlMigrationDirectory.replace("$CID", sparqlMigrationCID));
+            BigInteger migrationsAvailable = ethereumHelpers.getContract().getMigrationsLength().send();
+            for(BigInteger i = BigInteger.ZERO; i.compareTo(migrationsAvailable) < 0; i = i.add(BigInteger.ONE)) {
+                sparqlMigrationCID = ethereumHelpers.getContract().getSparqlMigration(i).send();
+                ipfsHelpers.retrieveFileAndSaveItToLocalSystem(sparqlMigrationCID, sparqlMigrationDirectory.replace("$CID", sparqlMigrationCID));
+            }
         }
 
         // Load the ontology files into the Apache Jena
         JenaHelpers jenaHelpers = new JenaHelpers(inputOntologyPath, useReasoner, isInitialLoad);
-        // TODO: support more than one migration
         jenaHelpers.executeSPARQLMigrationForDBSync(sparqlMigrationDirectory.replace("$CID", sparqlMigrationCID));
 
         for (String query : SPARQLQueries) {
