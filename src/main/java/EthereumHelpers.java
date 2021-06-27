@@ -59,7 +59,7 @@ public class EthereumHelpers {
         }
     }
 
-    public String deployStorageContract() {
+    public void deployStorageContract() {
         Storage helloWorld = null;
         try {
             helloWorld = Storage.deploy(web3, credentials, gasPrice, gasLimit).send();
@@ -67,7 +67,9 @@ public class EthereumHelpers {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return helloWorld.getContractAddress();
+        String contractAddress = helloWorld.getContractAddress();
+        log.info("[ETH] contract address: " + contractAddress);
+        loadContractAtAddress(contractAddress);
     }
 
     public Storage getContract() {

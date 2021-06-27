@@ -2,6 +2,7 @@ import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.listeners.StatementListener;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelChangedListener;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
@@ -49,16 +50,14 @@ public class JenaHelpers {
 
         if (inputOntologyFileName != null && isDataSetEmpty) {
             Txn.executeWrite(dataset, () -> {
-                RDFDataMgr.read(dataset, "ipfs-files/output/abox-axioms.ttl") ;
+                RDFDataMgr.read(dataset, inputOntologyFileName) ;
             });
         }
 
         dataset.begin(ReadWrite.READ);
         this.model = dataset.getDefaultModel();
-//        if (!inputOntologyFileName.toLowerCase().contains("dbpedia")) {
-//            ModelChangedListener modelChangedListener = new ModelListener();
-//            this.model.register(modelChangedListener);
-//        }
+        ModelChangedListener modelChangedListener = new ModelListener();
+        this.model.register(modelChangedListener);
 
         if (useReasoner) {
             // TODO: implement reasoner
@@ -241,6 +240,6 @@ public class JenaHelpers {
             UpdateAction.readExecute(locationOfSparql, dataset);
             dataset.commit();
         }
-        log.fine("Update file doesn't exist on initial db uplaod");
+        log.fine("Update file doesn't exist on initial DB upload");
     }
 }
