@@ -1,17 +1,18 @@
 env: development
 ontology:
   loadFromFiles:
-    - rdf-sparql/input/izobrazevanje.owl
-  #  - TBox_DBpedia_ontology_type=parsed.xml
-  #  - ABox_DBpedia_instance-types_lang=en_specific.ttl.gz
-  dumpToFiles:
-    - rbox: ipfs-files/output/rbox-axioms.ttl
-    - abox: ipfs-files/output/abox-axioms.ttl
-    - tbox: ipfs-files/output/tbox-axioms.ttl
+    - rdf-sparql/input/izobrazevanje.ttl
+    - rdf-sparql/input/TBox_DBpedia_ontology_type=parsed.xml
+#    - rdf-sparql/input/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz
   SPARQLQueries:
+#    - rdf-sparql/input/select-dbpedia-abox.ru
+#    - rdf-sparql/input/delete-dbpedia-abox.ru
+##    - rdf-sparql/input/insert-dbpedia-abox.ru
+#    - rdf-sparql/input/delete-dbpedia-tbox.ru
+#    - rdf-sparql/input/insert-dbpedia-tbox.ru
+#    - rdf-sparql/input/select-dbpedia-tbox.ru
     - rdf-sparql/input/select-abox.ru
     - rdf-sparql/input/delete-abox.ru
-#    - rdf-sparql/input/delete-rbox.ru
     - rdf-sparql/input/insert-abox.ru
     - rdf-sparql/input/delete-tbox.ru
     - rdf-sparql/input/insert-tbox.ru
