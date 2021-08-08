@@ -1,4 +1,6 @@
 import org.apache.jena.dboe.base.file.Location;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.listeners.StatementListener;
 import org.apache.jena.rdf.model.*;
@@ -10,11 +12,16 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.system.Txn;
 import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.update.UpdateAction;
+import org.apache.jena.vocabulary.RDF;
+
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Scanner;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.SecureRandom;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,12 +29,18 @@ class ModelListener extends StatementListener {
     @Override
     public void addedStatement(Statement s)
     {
-        // Identify type of box UPDATE to know if change is abox,rbox,tbox based
+        // Identify type of box UPDATE to know if change is abox, rbox, tbox based
         System.out.println( "[Ontology] >> added statement " + s );
     }
 
     @Override
     public void removedStatement(Statement s) {
+//        Set<Property> owlAnnotationProperties = new HashSet<Property>() {{
+//            add( RDF.type );
+//        }};
+//
+//        s.getPredicate();
+        // Load STATEMENT into OWL-API (s.toString()), and identify axiom type
         // Identify type of box UPDATE to know if change is abox,rbox,tbox based
         System.out.println( "[Ontology] >> removed statement " + s );
     }
@@ -95,7 +108,7 @@ public class JenaHelpers {
         return true;
     }
 
-    public Boolean executeSPARQL(String SPARQLQueryFileLocation, ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+    public Boolean executeSPARQL(String SPARQLQueryFileLocation, ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) throws IOException {
         File file = new File(SPARQLQueryFileLocation);
         Boolean executeSelect = false;
         String sparqlQueryString = "";
@@ -103,7 +116,7 @@ public class JenaHelpers {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                sparqlQueryString += line;
+                sparqlQueryString += line + "\n";
             }
             if (sparqlQueryString.toLowerCase().contains("select")) {
                 executeSelect = true;
@@ -111,6 +124,15 @@ public class JenaHelpers {
         } catch(FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        String dateString = "# DATE: "+new Date()+'\n';
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        String saltString = "# SALT: "+salt + '\n';
+        String migrationFileContents = dateString+saltString+sparqlQueryString;
+
+        Files.write(Paths.get(SPARQLQueryFileLocation), migrationFileContents.getBytes(StandardCharsets.UTF_8));
         if (executeSelect) {
             return executeSPARQLSelectQuery(SPARQLQueryFileLocation);
         } else {
