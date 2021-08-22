@@ -1,7 +1,11 @@
 import org.apache.jena.dboe.base.file.Location;
+import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.listeners.StatementListener;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.InfModel;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.reasoner.ValidityReport;
@@ -61,11 +65,11 @@ public class JenaHelpers {
 
         dataset.begin(ReadWrite.READ);
         this.model = dataset.getDefaultModel();
-        ModelChangedListener modelChangedListener = new ModelListener();
-        this.model.register(modelChangedListener);
+//        ModelChangedListener modelChangedListener = new ModelListener();
+//        this.model.register(modelChangedListener);
 
         if (useReasoner) {
-            if (isOntologyConsistent(this.model)) {
+            if (isOntologyConsistent(this.model, isDataSetEmpty)) {
                 log.info("Loaded ontology is consistent");
             } else {
                 log.severe( "Loaded ontology is not consistent, fix it and try again!");
@@ -75,12 +79,14 @@ public class JenaHelpers {
         dataset.end();
     }
 
-    public Boolean isOntologyConsistent(Model targetModel) {
+    public Boolean isOntologyConsistent(Model targetModel, Boolean isDataSetEmpty) {
         Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
-
-        InfModel infModel = ModelFactory.createInfModel(reasoner, targetModel);
-
+        OntModelSpec ontModelSpec = new OntModelSpec(OntModelSpec.RDFS_MEM);
+        ontModelSpec.setReasoner(reasoner);
+        InfModel infModel = ModelFactory.createOntologyModel(ontModelSpec, targetModel);
         ValidityReport validityReport = infModel.validate();
+        dataset.end();
+
         if ( !validityReport.isValid() ) {
             log.fine("Ontology is not consistent");
             Iterator<ValidityReport.Report> iter = validityReport.getReports();
@@ -91,6 +97,12 @@ public class JenaHelpers {
             return false;
         } else {
             log.fine( "Ontology is consistent");
+            dataset.begin(ReadWrite.WRITE);
+            if (isDataSetEmpty) {
+                this.model.add(infModel);
+            }
+            dataset.commit();
+            dataset.end();
         }
         return true;
     }
@@ -145,7 +157,8 @@ public class JenaHelpers {
         UpdateAction.parseExecute(sparqlString, this.model);
 
         if (this.useReasoner) {
-            if (!isOntologyConsistent(this.model)) {
+            // TODO: handle duplicate inferences that would be added to the model if we pass true here. UPDATE?
+            if (!isOntologyConsistent(this.model, false)) {
                 log.severe("Ontology would be no longer consistent if this query is applied to dataset, only consistent changes will be persisted.");
                 dataset.abort();
                 dataset.end();

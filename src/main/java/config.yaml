@@ -1,21 +1,54 @@
 env: development
 ontology:
   loadFromFiles:
-    - rdf-sparql/input/izobrazevanje.ttl
-    - rdf-sparql/input/TBox_DBpedia_ontology_type=parsed.xml
-#    - rdf-sparql/input/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz
+#    - rdf-sparql/input-izobrazevanje/izobrazevanje.ttl
+#
+#    - rdf-sparql/input-dbpedia/TBox_DBpedia_ontology_type=parsed.xml
+#
+    - rdf-sparql/input-lubm/uba1.7University0_1.owl
+    - rdf-sparql/input-lubm/uba1.7University0_3.owl
+    - rdf-sparql/input-lubm/uba1.7University0_0.owl
+    - rdf-sparql/input-lubm/uba1.7University0_2.owl
+    - rdf-sparql/input-lubm/uba1.7University0_4.owl
+    - rdf-sparql/input-lubm/uba1.7University0_5.owl
+    - rdf-sparql/input-lubm/uba1.7University0_6.owl
+    - rdf-sparql/input-lubm/uba1.7University0_7.owl
+    - rdf-sparql/input-lubm/uba1.7University0_8.owl
+    - rdf-sparql/input-lubm/uba1.7University0_9.owl
+    - rdf-sparql/input-lubm/uba1.7University0_10.owl
+    - rdf-sparql/input-lubm/uba1.7University0_11.owl
+    - rdf-sparql/input-lubm/uba1.7University0_12.owl
+    - rdf-sparql/input-lubm/uba1.7University0_13.owl
+    - rdf-sparql/input-lubm/uba1.7University0_14.owl
   SPARQLQueries:
-#    - rdf-sparql/input/select-dbpedia-abox.ru
-#    - rdf-sparql/input/delete-dbpedia-abox.ru
-##    - rdf-sparql/input/insert-dbpedia-abox.ru
-#    - rdf-sparql/input/delete-dbpedia-tbox.ru
-#    - rdf-sparql/input/insert-dbpedia-tbox.ru
-#    - rdf-sparql/input/select-dbpedia-tbox.ru
-    - rdf-sparql/input/select-abox.ru
-    - rdf-sparql/input/delete-abox.ru
-    - rdf-sparql/input/insert-abox.ru
-    - rdf-sparql/input/delete-tbox.ru
-    - rdf-sparql/input/insert-tbox.ru
+#    - rdf-sparql/queries-izobrazevanje/select-abox.ru
+#    - rdf-sparql/queries-izobrazevanje/delete-abox.ru
+#    - rdf-sparql/queries-izobrazevanje/insert-abox.ru
+#    - rdf-sparql/queries-izobrazevanje/delete-tbox.ru
+#    - rdf-sparql/queries-izobrazevanje/insert-tbox.ru
+#    - rdf-sparql/queries-izobrazevanje/select-test-inference.ru
+#
+#    - rdf-sparql/queries-dbpedia/select-dbpedia-abox.ru
+#    - rdf-sparql/queries-dbpedia/delete-dbpedia-abox.ru
+#    - rdf-sparql/queries-dbpedia/insert-dbpedia-abox.ru
+#    - rdf-sparql/queries-dbpedia/delete-dbpedia-tbox.ru
+#    - rdf-sparql/queries-dbpedia/insert-dbpedia-tbox.ru
+#    - rdf-sparql/queries-dbpedia/select-dbpedia-tbox.ru
+#
+    - rdf-sparql/queries-lubm/query-1.ru
+    - rdf-sparql/queries-lubm/query-2.ru
+    - rdf-sparql/queries-lubm/query-3.ru
+    - rdf-sparql/queries-lubm/query-4.ru
+    - rdf-sparql/queries-lubm/query-5.ru
+    - rdf-sparql/queries-lubm/query-6.ru
+    - rdf-sparql/queries-lubm/query-7.ru
+    - rdf-sparql/queries-lubm/query-8.ru
+    - rdf-sparql/queries-lubm/query-9.ru
+    - rdf-sparql/queries-lubm/query-10.ru
+    - rdf-sparql/queries-lubm/query-11.ru
+    - rdf-sparql/queries-lubm/query-12.ru
+    - rdf-sparql/queries-lubm/query-13.ru
+    - rdf-sparql/queries-lubm/query-14.ru
 IPFS:
   nodeAddress: /ip4/127.0.0.1/tcp/5001
 ethereum:

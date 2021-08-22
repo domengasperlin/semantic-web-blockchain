@@ -30,6 +30,10 @@ In order to connect to other Ethereum node change ethereum/nodeAddress in config
 ### Run IPFS node
 [IPFS](https://ipfs.io/#install)
 
+### Generating LUBM dataset
+```bash
+java -cp classes/ edu.lehigh.swat.bench.uba.Generator -univ 1 -seed 0 -onto http://swat.cse.lehigh.edu/onto/univ-bench.owl
+```
 
 ### Loading rdf data into database quickly
 [tdbloader](https://jena.apache.org/documentation/tdb/commands.html#installation)
