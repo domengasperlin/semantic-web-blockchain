@@ -85,7 +85,6 @@ public class JenaHelpers {
         ontModelSpec.setReasoner(reasoner);
         InfModel infModel = ModelFactory.createOntologyModel(ontModelSpec, targetModel);
         ValidityReport validityReport = infModel.validate();
-        dataset.end();
 
         if ( !validityReport.isValid() ) {
             log.fine("Ontology is not consistent");
@@ -94,15 +93,21 @@ public class JenaHelpers {
                 ValidityReport.Report report = iter.next();
                 log.info(report.toString());
             }
+            log.severe("Ontology would be no longer consistent if this query is applied to dataset, only consistent changes will be persisted.");
+            dataset.abort();
+            dataset.end();
             return false;
         } else {
             log.fine( "Ontology is consistent");
-            dataset.begin(ReadWrite.WRITE);
-            if (isDataSetEmpty) {
-                this.model.add(infModel);
-            }
             dataset.commit();
             dataset.end();
+
+            if (isDataSetEmpty) {
+                dataset.begin(ReadWrite.WRITE);
+                this.model.add(infModel);
+                dataset.commit();
+                dataset.end();
+            }
         }
         return true;
     }
@@ -159,15 +164,13 @@ public class JenaHelpers {
         if (this.useReasoner) {
             // TODO: handle duplicate inferences that would be added to the model if we pass true here. UPDATE?
             if (!isOntologyConsistent(this.model, false)) {
-                log.severe("Ontology would be no longer consistent if this query is applied to dataset, only consistent changes will be persisted.");
-                dataset.abort();
-                dataset.end();
                 return false;
             }
+        } else {
+            dataset.commit();
+            dataset.end();
         }
         uploadChangesToBlockchains(inputOntologyFiles, locationOfSPARQL, ipfsHelpers, ethereumHelpers);
-        dataset.commit();
-        dataset.end();
         return true;
 
     }
