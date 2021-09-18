@@ -54,7 +54,7 @@ public class Demo {
             String sparqlMigrationCID = ethereumHelpers.getContract().pridobiMigracijo(i).send();
             String sparqlMigrationLocation = sparqlMigrationDirectory.replace("$CID", sparqlMigrationCID);
             ipfsHelpers.retrieveFileAndSaveItToLocalSystem(sparqlMigrationCID, sparqlMigrationLocation);
-            jenaHelpers.executeSPARQLMigrationForDBSync(sparqlMigrationLocation);
+            jenaHelpers.executeSPARQLMigrationForDBSync(sparqlMigrationCID, sparqlMigrationLocation);
         }
 
         for (String query : SPARQLQueries) {

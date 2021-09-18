@@ -42,6 +42,7 @@ public class JenaHelpers {
     private Dataset dataset;
     private Model model;
 
+    private static String SPARQLMigrationsNamespace = "http://www.semanticweb.org/domen/sparql/migrations";
     private static String ethContractNamespace = "http://www.semanticweb.org/domen/ethereum/contract";
     private static Property hasAddress = ResourceFactory.createProperty(ethContractNamespace, "hasAddress");
 
@@ -193,6 +194,33 @@ public class JenaHelpers {
         dataset.end();
     }
 
+    public void saveRanSparqlMigrationToRDFDatabase(String migrationCID) {
+        dataset.begin(ReadWrite.WRITE);
+        Resource SPARQLMigrationsResource = this.model.createResource(SPARQLMigrationsNamespace);
+        Bag migrationsBag = model.getBag(SPARQLMigrationsResource);
+        migrationsBag.add(migrationCID);
+        dataset.commit();
+        dataset.end();
+
+        dataset.begin(ReadWrite.READ);
+        Iterator bagStatements = SPARQLMigrationsResource.listProperties();
+        ArrayList<String> migrationCIDsInBag = new ArrayList<>();
+        while(bagStatements.hasNext()) {
+            Statement next = (Statement) bagStatements.next();
+            migrationCIDsInBag.add(next.getLiteral().toString());
+        }
+        log.info("Migrations already ran will be skipped: "+migrationCIDsInBag);
+        dataset.end();
+    }
+
+    public Boolean hasMigrationBeenRanAlready(String migrationCID) {
+        dataset.begin(ReadWrite.READ);
+        Bag migrationsBag = model.getBag(SPARQLMigrationsNamespace);
+        Boolean migrationRan = migrationsBag.contains(migrationCID);
+        dataset.end();
+        return migrationRan;
+    }
+
     public String retrieveEthContractAddressFromRDFDatabase() {
         dataset.begin(ReadWrite.READ);
         Statement property = this.model.getResource(ethContractNamespace).getProperty(hasAddress);
@@ -219,8 +247,12 @@ public class JenaHelpers {
 
     public void uploadChangesToBlockchains(String locationOfSparql, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         String sparqlQueryCID = ipfsHelpers.uploadLocalFileToIPFS(locationOfSparql).toString();
+        if (hasMigrationBeenRanAlready(sparqlQueryCID)) {
+            return;
+        }
         try {
             ethereumHelpers.getContract().dodajMigracijo(sparqlQueryCID).send();
+            saveRanSparqlMigrationToRDFDatabase(sparqlQueryCID);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -232,13 +264,15 @@ public class JenaHelpers {
         dataset.end();
     }
 
-    public void executeSPARQLMigrationForDBSync(String locationOfSparql) {
+    public void executeSPARQLMigrationForDBSync(String sparqlMigrationCID, String locationOfSparql) {
         File f = new File(locationOfSparql);
         if(f.exists() && !f.isDirectory()) {
+            if (hasMigrationBeenRanAlready(sparqlMigrationCID)) return;
             dataset.begin(ReadWrite.WRITE);
             log.info("[Executing SPARQL migration from query file (.rq)] " + locationOfSparql);
             UpdateAction.readExecute(locationOfSparql, dataset);
             dataset.commit();
+            saveRanSparqlMigrationToRDFDatabase(sparqlMigrationCID);
         }
         log.fine("Update file doesn't exist on initial DB upload");
     }
