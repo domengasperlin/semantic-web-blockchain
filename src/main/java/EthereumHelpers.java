@@ -16,7 +16,8 @@ public class EthereumHelpers {
     private BigInteger gasPrice;
     Shramba storageContract;
     private static final Logger log = Logger.getLogger(EthereumHelpers.class.getName());
-    public EthereumHelpers(String ethereumNodeAddress, ConfigLoader configLoader) {
+    public EthereumHelpers(ConfigLoader configLoader) {
+        String ethereumNodeAddress = (String) configLoader.getEthereum().get("naslovVozlisca");
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
         if (configLoader.isDevelopment()) {
             // Ganache specific
@@ -59,7 +60,7 @@ public class EthereumHelpers {
         }
     }
 
-    public void deployStorageContract() {
+    public void deployStorageContractAndSaveAddressToRDFDatabase(JenaHelpers jenaHelpers) {
         Shramba helloWorld = null;
         try {
             helloWorld = Shramba.deploy(web3, credentials, gasPrice, gasLimit).send();
@@ -70,6 +71,7 @@ public class EthereumHelpers {
         String contractAddress = helloWorld.getContractAddress();
         log.info("[ETH] contract address: " + contractAddress);
         loadContractAtAddress(contractAddress);
+        jenaHelpers.saveEthContractAddressToRDFDatabase(contractAddress);
     }
 
     public Shramba getContract() {

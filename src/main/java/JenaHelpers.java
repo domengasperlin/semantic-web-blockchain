@@ -2,10 +2,7 @@ import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.listeners.StatementListener;
-import org.apache.jena.rdf.model.InfModel;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.reasoner.ValidityReport;
@@ -14,6 +11,8 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.system.Txn;
 import org.apache.jena.tdb2.TDB2Factory;
 import org.apache.jena.update.UpdateAction;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -40,13 +39,15 @@ class ModelListener extends StatementListener {
 public class JenaHelpers {
     private static String datasetLocation = "target/dataset";
     private static Boolean useReasoner;
-    private static Boolean isInitialLoad;
     private Dataset dataset;
     private Model model;
 
+    private static String ethContractNamespace = "http://www.semanticweb.org/domen/ethereum/contract";
+    private static Property hasAddress = ResourceFactory.createProperty(ethContractNamespace, "hasAddress");
+
+
     private static final Logger log = Logger.getLogger(JenaHelpers.class.getName());
-    public JenaHelpers(ArrayList<String> inputOntologyFiles, Boolean useReasoner, Boolean isInitialLoad) throws Exception {
-        this.isInitialLoad = isInitialLoad;
+    public JenaHelpers(ArrayList<String> inputOntologyFiles, Boolean useReasoner) throws Exception {
         this.useReasoner = useReasoner;
         log.setLevel(Level.FINE);
         dataset = TDB2Factory.connectDataset(Location.create(datasetLocation));
@@ -170,26 +171,44 @@ public class JenaHelpers {
             dataset.commit();
             dataset.end();
         }
-        uploadChangesToBlockchains(inputOntologyFiles, locationOfSPARQL, ipfsHelpers, ethereumHelpers);
+        uploadChangesToBlockchains(locationOfSPARQL, ipfsHelpers, ethereumHelpers);
         return true;
 
     }
 
-    public void uploadChangesToBlockchains(ArrayList<String> inputOntologyFiles, String locationOfSparql, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
-        // If it is initial load then save CIDS of axiom files to the IPFS
-        if (isInitialLoad) {
-            for (String inputOntologyFile : inputOntologyFiles) {
-                String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(inputOntologyFile).toString();
+    public void saveEthContractAddressToRDFDatabase(String ethereumContractAddress) {
+        dataset.begin(ReadWrite.WRITE);
+        Resource ethereumContract = this.model.createResource(ethContractNamespace);
+        ethereumContract.addProperty(hasAddress, ethereumContractAddress);
+        dataset.commit();
+        dataset.end();
+    }
 
-                try {
-                    ethereumHelpers.getContract().dodajVhodnoOntologijo(xBoxCID);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            isInitialLoad = false;
+    public String retrieveEthContractAddressFromRDFDatabase() {
+        dataset.begin(ReadWrite.READ);
+        Statement property = this.model.getResource(ethContractNamespace).getProperty(hasAddress);
+        dataset.end();
+        if (property != null) {
+            return property.getLiteral().toString();
+        } else {
+            return null;
         }
+    }
 
+    public void uploadInputOntologyFilesToBlockchains(ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+        for (String inputOntologyFile : inputOntologyFiles) {
+            String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(inputOntologyFile).toString();
+            log.info("[IPFS upload content identifier] " + xBoxCID);
+            try {
+                TransactionReceipt transaction = ethereumHelpers.getContract().dodajVhodnoOntologijo(xBoxCID).send();
+                log.info("[ETH] transaction: " + transaction.getTransactionHash());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void uploadChangesToBlockchains(String locationOfSparql, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         String sparqlQueryCID = ipfsHelpers.uploadLocalFileToIPFS(locationOfSparql).toString();
         try {
             ethereumHelpers.getContract().dodajMigracijo(sparqlQueryCID).send();

@@ -11,8 +11,9 @@ import java.nio.file.Paths;
 
 public class IPFSHelpers {
     IPFS ipfs;
-    public IPFSHelpers(IPFS ipfs) {
-        this.ipfs = ipfs;
+    public IPFSHelpers(ConfigLoader configLoader) {
+        String IPFSNodeAddress = (String) configLoader.getIPFS().get("naslovVozlisca");
+        this.ipfs = new IPFS(IPFSNodeAddress);
     }
     public Multihash uploadLocalFileToIPFS(String fileName) {
         Multihash hash = null;
