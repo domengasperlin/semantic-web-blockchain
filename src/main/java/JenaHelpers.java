@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.query.*;
@@ -15,7 +16,14 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -123,7 +131,7 @@ public class JenaHelpers {
         return true;
     }
 
-    public Boolean executeSPARQL(String SPARQLQueryFileLocation, ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+    public Boolean executeSPARQL(String SPARQLQueryFileLocation, ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) throws IOException {
         File file = new File(SPARQLQueryFileLocation);
         Boolean executeSelect = false;
         String sparqlQueryString = "";
@@ -132,6 +140,7 @@ public class JenaHelpers {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 sparqlQueryString += line;
+                if (scanner.hasNextLine()) sparqlQueryString += "\n";
             }
             if (sparqlQueryString.toLowerCase().contains("select")) {
                 executeSelect = true;
@@ -142,6 +151,16 @@ public class JenaHelpers {
         if (executeSelect) {
             return executeSPARQLSelectQuery(SPARQLQueryFileLocation);
         } else {
+
+            String migration = "# MIGRACIJA" + '\n';
+            if (!sparqlQueryString.contains(migration)) {
+                // Adds metadata to SPARQL migrations
+                String dateString = "# DATUM: "+new Date()+'\n';
+                String saltString = "# SOL: "+RandomStringUtils.randomAlphanumeric(30) + '\n';
+                String migrationFileContents = migration+dateString+saltString+sparqlQueryString;
+                Files.write(Paths.get(SPARQLQueryFileLocation), migrationFileContents.getBytes(StandardCharsets.UTF_8));
+            }
+
             return executeSPARQLUpdateAction(SPARQLQueryFileLocation, sparqlQueryString, ipfsHelpers, inputOntologyFiles, ethereumHelpers);
         }
 
