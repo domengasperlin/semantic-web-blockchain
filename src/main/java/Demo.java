@@ -43,7 +43,7 @@ public class Demo {
             // Store IPFS content identifiers to Ethereum
             ethereumHelpers.deployStorageContract();
             for (String inputOntologyCID : inputOntologyCIDs) {
-                TransactionReceipt transaction = ethereumHelpers.getContract().addInputOntology(inputOntologyCID).send();
+                TransactionReceipt transaction = ethereumHelpers.getContract().dodajVhodnoOntologijo(inputOntologyCID).send();
                 log.info("[ETH] transaction: " + transaction.getTransactionHash());
             }
 
@@ -52,9 +52,9 @@ public class Demo {
             String smartContractAddress = "0x7da519706a64299801f533369a3e36cc7503bd98";
             ethereumHelpers.loadContractAtAddress(smartContractAddress);
 
-            BigInteger inputOntologiesLength = ethereumHelpers.getContract().getInputOntologiesLength().send();
+            BigInteger inputOntologiesLength = ethereumHelpers.getContract().pridobiDolzinoVhodnihOntologij().send();
             for(BigInteger i = BigInteger.ZERO; i.compareTo(inputOntologiesLength) < 0; i = i.add(BigInteger.ONE)) {
-                String inputOntologyCID = ethereumHelpers.getContract().getInputOntology(i).send();
+                String inputOntologyCID = ethereumHelpers.getContract().pridobiVhodnoOntologijo(i).send();
                 // TODO: Here we are making assumption that input files are the same
                 String inputOntologyPath = inputOntologyFiles.get(i.intValue());
                 // Download ontology from IPFS
@@ -63,9 +63,9 @@ public class Demo {
             log.info("[IPFS downloaded and write to files]");
 
             // Download All SPARQL migrations
-            BigInteger sparqlMigrations = ethereumHelpers.getContract().getSUPMigrationsLength().send();
+            BigInteger sparqlMigrations = ethereumHelpers.getContract().pridobiDolzinoMigracij().send();
             for(BigInteger i = BigInteger.ZERO; i.compareTo(sparqlMigrations) < 0; i = i.add(BigInteger.ONE)) {
-                String sparqlMigrationCID = ethereumHelpers.getContract().getSUPMigration(i).send();
+                String sparqlMigrationCID = ethereumHelpers.getContract().pridobiMigracijo(i).send();
                 String sparqlMigrationLocation = sparqlMigrationDirectory.replace("$CID", sparqlMigrationCID);
                 ipfsHelpers.retrieveFileAndSaveItToLocalSystem(sparqlMigrationCID, sparqlMigrationLocation);
                 jenaHelpers.executeSPARQLMigrationForDBSync(sparqlMigrationLocation);

@@ -2,36 +2,36 @@ pragma solidity >=0.7.0 <0.9.0;
 
 // SPDX-License-Identifier: UNLICENSED
 contract Storage {
-    string[] inputOntologies;
-    string[] migrations;
+    string[] vhodneOntologije;
+    string[] migracije;
 
-    function addInputOntology(string memory _inputOntology) public {
-        inputOntologies.push(_inputOntology);
+    function dodajVhodnoOntologijo(string memory _vhodnaOntologija) public {
+        vhodneOntologije.push(_vhodnaOntologija);
     }
 
-    function getInputOntologiesLength() public view returns (uint) {
-        return inputOntologies.length;
+    function pridobiDolzinoVhodnihOntologij() public view returns (uint) {
+        return vhodneOntologije.length;
     }
 
-    function getInputOntology(uint index) public view returns (string memory) {
-        if (index < inputOntologies.length){
-            return inputOntologies[index];
+    function pridobiVhodnoOntologijo(uint indeks) public view returns (string memory) {
+        if (indeks < vhodneOntologije.length){
+            return vhodneOntologije[indeks];
         }
         return "";
     }
 
-    function getSUPMigrationsLength() public view returns (uint) {
-        return migrations.length;
+    function pridobiDolzinoMigracij() public view returns (uint) {
+        return migracije.length;
     }
 
-    function getSUPMigration(uint index) public view returns (string memory) {
-        if (index < migrations.length){
-            return migrations[index];
+    function pridobiMigracijo(uint indeks) public view returns (string memory) {
+        if (indeks < migracije.length){
+            return migracije[indeks];
         }
         return "";
     }
 
-    function addSUPMigration(string memory _sparqlUpdate) public {
-        migrations.push(_sparqlUpdate);
+    function dodajMigracijo(string memory _migracija) public {
+        migracije.push(_migracija);
     }
 }

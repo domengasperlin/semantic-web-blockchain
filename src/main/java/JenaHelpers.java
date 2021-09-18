@@ -182,7 +182,7 @@ public class JenaHelpers {
                 String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(inputOntologyFile).toString();
 
                 try {
-                    ethereumHelpers.getContract().addInputOntology(xBoxCID);
+                    ethereumHelpers.getContract().dodajVhodnoOntologijo(xBoxCID);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -192,7 +192,7 @@ public class JenaHelpers {
 
         String sparqlQueryCID = ipfsHelpers.uploadLocalFileToIPFS(locationOfSparql).toString();
         try {
-            ethereumHelpers.getContract().addSUPMigration(sparqlQueryCID).send();
+            ethereumHelpers.getContract().dodajMigracijo(sparqlQueryCID).send();
         } catch (Exception e) {
             e.printStackTrace();
         }
