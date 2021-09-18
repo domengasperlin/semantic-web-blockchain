@@ -48,7 +48,7 @@ public class Demo {
             throw new Exception("Neveljavna konfiguracija, podajte vhodne ontologije ali naslov ethereum pogodbe!");
         }
 
-        // Download All SPARQL migrations
+        // Download all not run SPARQL migrations
         BigInteger sparqlMigrations = ethereumHelpers.getContract().pridobiDolzinoMigracij().send();
         for(BigInteger i = BigInteger.ZERO; i.compareTo(sparqlMigrations) < 0; i = i.add(BigInteger.ONE)) {
             String sparqlMigrationCID = ethereumHelpers.getContract().pridobiMigracijo(i).send();
