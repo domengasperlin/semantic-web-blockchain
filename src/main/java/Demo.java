@@ -6,31 +6,21 @@ import java.util.logging.Logger;
 
 public class Demo {
     private static final Logger log = Logger.getLogger(Demo.class.getName());
-    public static Boolean useReasoner;
     public static Boolean isInitialLoad = true;
 
     public static void main(String[] args) throws Exception {
-        ConfigLoader configLoader = new ConfigLoader("src/main/java/config.yaml");
-        ArrayList<String> inputOntologyFiles = (ArrayList<String>) configLoader.getOntology().get("loadFromFiles");
-        String IPFSNodeAddress = (String) configLoader.getIPFS().get("nodeAddress");
-        String ethereumNodeAddress = (String) configLoader.getEthereum().get("nodeAddress");
-        ArrayList<String> SPARQLQueries = (ArrayList<String>) configLoader.getOntology().get("SPARQLQueries");
+        ConfigLoader configLoader = new ConfigLoader("src/main/java/konfiguracija.yaml");
+        ArrayList<String> inputOntologyFiles = (ArrayList<String>) configLoader.getOntology().get("naloziIzDatotek");
+        String IPFSNodeAddress = (String) configLoader.getIPFS().get("naslovVozlisca");
+        String ethereumNodeAddress = (String) configLoader.getEthereum().get("naslovVozlisca");
+        ArrayList<String> SPARQLQueries = (ArrayList<String>) configLoader.getOntology().get("poizvedbeSPARQL");
         String sparqlMigrationDirectory = "ipfs-files/output/sparql-migration-$CID.ru";
-
-        for (String query : SPARQLQueries) {
-            if (query.contains("dbpedia")) {
-                useReasoner = false;
-                break;
-            } else {
-                useReasoner = true;
-            }
-        }
 
         EthereumHelpers ethereumHelpers = new EthereumHelpers(ethereumNodeAddress, configLoader);
         IPFSHelpers ipfsHelpers = new IPFSHelpers(new IPFS(IPFSNodeAddress));
 
         // Load the ontology files into the Apache Jena
-        JenaHelpers jenaHelpers = new JenaHelpers(inputOntologyFiles, useReasoner, isInitialLoad);
+        JenaHelpers jenaHelpers = new JenaHelpers(inputOntologyFiles, configLoader.uporabiSklepanje(), isInitialLoad);
         // If exception is not thrown till this point and reasoner is active ontology is consistent and we can move on
         if (isInitialLoad) {
             // Upload ontology to IPFS

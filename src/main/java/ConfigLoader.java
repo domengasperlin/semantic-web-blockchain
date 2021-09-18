@@ -23,11 +23,17 @@ public class ConfigLoader {
     }
 
     public Boolean isDevelopment() {
-        return data.get("env").equals("development");
+        String ethereumNodeAddress = (String)getEthereum().get("naslovVozlisca");
+        return ethereumNodeAddress.contains("localhost");
+    }
+
+    public Boolean uporabiSklepanje() {
+        Boolean uporabiSklepanje = (Boolean)getOntology().get("uporabiSklepanje");
+        return uporabiSklepanje;
     }
 
     public Map<String, Object> getOntology() {
-        return (Map<String, Object>)data.get("ontology");
+        return (Map<String, Object>)data.get("ontologija");
     }
 
     public Map<String, Object> getIPFS() {
@@ -35,7 +41,7 @@ public class ConfigLoader {
     }
 
     public Map<String, Object> getEthereum() {
-        return (Map<String, Object>)data.get("ethereum");
+        return (Map<String, Object>)data.get("Ethereum");
     }
 
     public String getABoxFilePath() {

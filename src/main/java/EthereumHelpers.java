@@ -1,4 +1,4 @@
-import contracts.Storage;
+import contracts.Shramba;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
@@ -14,7 +14,7 @@ public class EthereumHelpers {
     Credentials credentials;
     private BigInteger gasLimit;
     private BigInteger gasPrice;
-    Storage storageContract;
+    Shramba storageContract;
     private static final Logger log = Logger.getLogger(EthereumHelpers.class.getName());
     public EthereumHelpers(String ethereumNodeAddress, ConfigLoader configLoader) {
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
@@ -31,7 +31,7 @@ public class EthereumHelpers {
 
     public void loadContractAtAddress(String contractAddress) {
         try {
-            Storage storageContr = Storage.load(contractAddress, web3, credentials, gasPrice, gasLimit);
+            Shramba storageContr = Shramba.load(contractAddress, web3, credentials, gasPrice, gasLimit);
             if (storageContr.isValid()) {
                 this.storageContract = storageContr;
             }
@@ -41,9 +41,9 @@ public class EthereumHelpers {
     }
 
     public void loadWalletCredentials(ConfigLoader configLoader) {
-        String ethereumWalletLocation = (String)configLoader.getEthereum().get("walletPath");
-        String ethereumWalletPassword = (String)configLoader.getEthereum().get("walletPassword");
-        String ethereumWalletPrivateKey = (String)configLoader.getEthereum().get("walletPrivateKey");
+        String ethereumWalletLocation = (String)configLoader.getEthereum().get("lokacijaDenarnice");
+        String ethereumWalletPassword = (String)configLoader.getEthereum().get("gesloDenarnice");
+        String ethereumWalletPrivateKey = (String)configLoader.getEthereum().get("zasebniKljucDenarnice");
 
         if (ethereumWalletPrivateKey != null) {
             this.credentials = Credentials.create(ethereumWalletPrivateKey);
@@ -60,9 +60,9 @@ public class EthereumHelpers {
     }
 
     public void deployStorageContract() {
-        Storage helloWorld = null;
+        Shramba helloWorld = null;
         try {
-            helloWorld = Storage.deploy(web3, credentials, gasPrice, gasLimit).send();
+            helloWorld = Shramba.deploy(web3, credentials, gasPrice, gasLimit).send();
             storageContract = helloWorld;
         } catch (Exception e) {
             e.printStackTrace();
@@ -72,7 +72,7 @@ public class EthereumHelpers {
         loadContractAtAddress(contractAddress);
     }
 
-    public Storage getContract() {
+    public Shramba getContract() {
         return this.storageContract;
     }
 }
