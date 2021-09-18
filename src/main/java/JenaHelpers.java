@@ -47,16 +47,23 @@ public class JenaHelpers {
 
 
     private static final Logger log = Logger.getLogger(JenaHelpers.class.getName());
-    public JenaHelpers(ArrayList<String> inputOntologyFiles, Boolean useReasoner) throws Exception {
+    public JenaHelpers(Boolean useReasoner) {
         this.useReasoner = useReasoner;
         log.setLevel(Level.FINE);
         dataset = TDB2Factory.connectDataset(Location.create(datasetLocation));
 
         dataset.begin(ReadWrite.READ);
-        Boolean isDataSetEmpty = dataset.isEmpty();
+        this.model = dataset.getDefaultModel();
+//        ModelChangedListener modelChangedListener = new ModelListener();
+//        this.model.register(modelChangedListener);
+        dataset.end();
+    }
+    public void loadInputOntologiesIFEmptyDatasetIFReasonerConsistencyCheckInfModelAdd(ArrayList<String> inputOntologyFiles) throws Exception {
+        dataset.begin(ReadWrite.READ);
+        boolean isModelEmpty = this.model.isEmpty();
         dataset.end();
 
-        if (isDataSetEmpty) {
+        if (isModelEmpty) {
             for (String inputOntologyFileName : inputOntologyFiles) {
                 if (inputOntologyFileName != null) {
                     Txn.executeWrite(dataset, () -> RDFDataMgr.read(dataset, inputOntologyFileName));
@@ -64,23 +71,25 @@ public class JenaHelpers {
             }
         }
 
-        dataset.begin(ReadWrite.READ);
-        this.model = dataset.getDefaultModel();
-//        ModelChangedListener modelChangedListener = new ModelListener();
-//        this.model.register(modelChangedListener);
-
         if (useReasoner) {
-            if (isOntologyConsistent(this.model, isDataSetEmpty)) {
+            dataset.begin(ReadWrite.WRITE);
+            if (isOntologyConsistent(this.model, useReasoner)) {
                 log.info("Loaded ontology is consistent");
             } else {
                 log.severe( "Loaded ontology is not consistent, fix it and try again!");
                 throw new Exception("Ontology is not consistent");
             }
         }
+    }
+
+    public void purgeJenaModel() {
+        dataset.begin(ReadWrite.WRITE);
+        this.model.removeAll();
+        dataset.commit();
         dataset.end();
     }
 
-    public Boolean isOntologyConsistent(Model targetModel, Boolean isDataSetEmpty) {
+    public Boolean isOntologyConsistent(Model targetModel, Boolean addInferenceModelFromReasoner) {
         Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
         OntModelSpec ontModelSpec = new OntModelSpec(OntModelSpec.RDFS_MEM);
         ontModelSpec.setReasoner(reasoner);
@@ -103,7 +112,7 @@ public class JenaHelpers {
             dataset.commit();
             dataset.end();
 
-            if (isDataSetEmpty) {
+            if (addInferenceModelFromReasoner) {
                 dataset.begin(ReadWrite.WRITE);
                 this.model.add(infModel);
                 dataset.commit();

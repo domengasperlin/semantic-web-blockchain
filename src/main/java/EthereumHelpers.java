@@ -60,7 +60,7 @@ public class EthereumHelpers {
         }
     }
 
-    public void deployStorageContractAndSaveAddressToRDFDatabase(JenaHelpers jenaHelpers) {
+    public String deployStorageContract() {
         Shramba helloWorld = null;
         try {
             helloWorld = Shramba.deploy(web3, credentials, gasPrice, gasLimit).send();
@@ -71,7 +71,7 @@ public class EthereumHelpers {
         String contractAddress = helloWorld.getContractAddress();
         log.info("[ETH] contract address: " + contractAddress);
         loadContractAtAddress(contractAddress);
-        jenaHelpers.saveEthContractAddressToRDFDatabase(contractAddress);
+        return contractAddress;
     }
 
     public Shramba getContract() {

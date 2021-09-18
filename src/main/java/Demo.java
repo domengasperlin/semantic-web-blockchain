@@ -12,30 +12,41 @@ public class Demo {
         ArrayList<String> SPARQLQueries = (ArrayList<String>) configLoader.getOntology().get("poizvedbeSPARQL");
         String sparqlMigrationDirectory = "ipfs-files/output/sparql-migration-$CID.ru";
 
-        // Load the ontology files into the Apache Jena, with active reasoner also checks if input ontology is consistent
-        JenaHelpers jenaHelpers = new JenaHelpers(inputOntologyFiles, configLoader.uporabiSklepanje());
+        IPFSHelpers ipfsHelpers = new IPFSHelpers(configLoader);
+        EthereumHelpers ethereumHelpers = new EthereumHelpers(configLoader);
+
+        // Connects to Apache Jena dataset, creates empty one if not existent
+        JenaHelpers jenaHelpers = new JenaHelpers(configLoader.uporabiSklepanje());
+        String ethereumContractAddress = jenaHelpers.retrieveEthContractAddressFromRDFDatabase();
 
         // Save them on blockchains
-        String ethereumContractAddress = jenaHelpers.retrieveEthContractAddressFromRDFDatabase();
-        EthereumHelpers ethereumHelpers = new EthereumHelpers(configLoader);
-        IPFSHelpers ipfsHelpers = new IPFSHelpers(configLoader);
-        if (ethereumContractAddress == null) {
-            ethereumHelpers.deployStorageContractAndSaveAddressToRDFDatabase(jenaHelpers);
+        if (ethereumContractAddress == null && inputOntologyFiles != null) {
+            jenaHelpers.loadInputOntologiesIFEmptyDatasetIFReasonerConsistencyCheckInfModelAdd(inputOntologyFiles);
+            jenaHelpers.saveEthContractAddressToRDFDatabase(ethereumHelpers.deployStorageContract());
             jenaHelpers.uploadInputOntologyFilesToBlockchains(inputOntologyFiles, ipfsHelpers, ethereumHelpers);
-        } else {
+        } else if (ethereumContractAddress != null) {
             ethereumHelpers.loadContractAtAddress(jenaHelpers.retrieveEthContractAddressFromRDFDatabase());
+            // FRESH OF RDF DATABASE: Downloads input ontologies from blockchains to folder and then loads them in Jena
+            if (inputOntologyFiles == null) {
+                // TODO: assuming ttl ending
+                String restoredOntologiesDirectory = "rdf-sparql/ontologija-obnovljena/vhodna-ontologija-$CID.ttl";
+                // Retrieve IPFS content identifiers from Ethereum
+                ArrayList<String> inputOntologyFilesFromBlockchains = new ArrayList<>();
+                BigInteger inputOntologiesLength = ethereumHelpers.getContract().pridobiDolzinoVhodnihOntologij().send();
+                for(BigInteger i = BigInteger.ZERO; i.compareTo(inputOntologiesLength) < 0; i = i.add(BigInteger.ONE)) {
+                    String inputOntologyCID = ethereumHelpers.getContract().pridobiVhodnoOntologijo(i).send();
+                    String inputOntologyPath = restoredOntologiesDirectory.replace("$CID", inputOntologyCID);
+                    // Download ontology from IPFS
+                    ipfsHelpers.retrieveFileAndSaveItToLocalSystem(inputOntologyCID, inputOntologyPath);
+                    inputOntologyFilesFromBlockchains.add(inputOntologyPath);
+                }
+                log.info("[IPFS downloaded and write to files]");
+                jenaHelpers.purgeJenaModel();
+                jenaHelpers.loadInputOntologiesIFEmptyDatasetIFReasonerConsistencyCheckInfModelAdd(inputOntologyFilesFromBlockchains);
+            }
+        } else {
+            throw new Exception("Neveljavna konfiguracija, podajte vhodne ontologije ali naslov ethereum pogodbe!");
         }
-
-        // Retrieve IPFS content identifiers from Ethereum
-        BigInteger inputOntologiesLength = ethereumHelpers.getContract().pridobiDolzinoVhodnihOntologij().send();
-        for(BigInteger i = BigInteger.ZERO; i.compareTo(inputOntologiesLength) < 0; i = i.add(BigInteger.ONE)) {
-            String inputOntologyCID = ethereumHelpers.getContract().pridobiVhodnoOntologijo(i).send();
-            // TODO: Here we are making assumption that input files are the same
-            String inputOntologyPath = inputOntologyFiles.get(i.intValue());
-            // Download ontology from IPFS
-            ipfsHelpers.retrieveFileAndSaveItToLocalSystem(inputOntologyCID, inputOntologyPath);
-        }
-        log.info("[IPFS downloaded and write to files]");
 
         // Download All SPARQL migrations
         BigInteger sparqlMigrations = ethereumHelpers.getContract().pridobiDolzinoMigracij().send();
