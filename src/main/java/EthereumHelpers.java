@@ -16,6 +16,7 @@ public class EthereumHelpers {
     private BigInteger gasPrice;
     Shramba storageContract;
     private static final Logger log = Logger.getLogger(EthereumHelpers.class.getName());
+
     public EthereumHelpers(ConfigLoader configLoader) {
         String ethereumNodeAddress = (String) configLoader.getEthereum().get("naslovVozlisca");
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
@@ -42,14 +43,13 @@ public class EthereumHelpers {
     }
 
     public void loadWalletCredentials(ConfigLoader configLoader) {
-        String ethereumWalletLocation = (String)configLoader.getEthereum().get("lokacijaDenarnice");
-        String ethereumWalletPassword = (String)configLoader.getEthereum().get("gesloDenarnice");
-        String ethereumWalletPrivateKey = (String)configLoader.getEthereum().get("zasebniKljucDenarnice");
+        String ethereumWalletLocation = (String) configLoader.getEthereum().get("lokacijaDenarnice");
+        String ethereumWalletPassword = (String) configLoader.getEthereum().get("gesloDenarnice");
+        String ethereumWalletPrivateKey = (String) configLoader.getEthereum().get("zasebniKljucDenarnice");
 
         if (ethereumWalletPrivateKey != null) {
             this.credentials = Credentials.create(ethereumWalletPrivateKey);
-        }
-        else if (ethereumWalletLocation != null) {
+        } else if (ethereumWalletLocation != null) {
             try {
                 this.credentials = WalletUtils.loadCredentials(ethereumWalletPassword, ethereumWalletLocation);
             } catch (Exception e) {

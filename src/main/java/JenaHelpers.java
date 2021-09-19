@@ -17,11 +17,9 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -31,16 +29,15 @@ import java.util.logging.Logger;
 
 class ModelListener extends StatementListener {
     @Override
-    public void addedStatement(Statement s)
-    {
+    public void addedStatement(Statement s) {
         // Identify type of box UPDATE to know if change is abox,rbox,tbox based
-        System.out.println( "[Ontology] >> added statement " + s );
+        System.out.println("[Ontology] >> added statement " + s);
     }
 
     @Override
     public void removedStatement(Statement s) {
         // Identify type of box UPDATE to know if change is abox,rbox,tbox based
-        System.out.println( "[Ontology] >> removed statement " + s );
+        System.out.println("[Ontology] >> removed statement " + s);
     }
 }
 
@@ -56,6 +53,7 @@ public class JenaHelpers {
 
 
     private static final Logger log = Logger.getLogger(JenaHelpers.class.getName());
+
     public JenaHelpers(Boolean useReasoner) {
         this.useReasoner = useReasoner;
         log.setLevel(Level.FINE);
@@ -67,6 +65,7 @@ public class JenaHelpers {
 //        this.model.register(modelChangedListener);
         dataset.end();
     }
+
     public void loadInputOntologiesIFEmptyDatasetIFReasonerConsistencyCheckInfModelAdd(ArrayList<String> inputOntologyFiles) throws Exception {
         dataset.begin(ReadWrite.READ);
         boolean isModelEmpty = this.model.isEmpty();
@@ -85,7 +84,7 @@ public class JenaHelpers {
             if (isOntologyConsistent(this.model, useReasoner)) {
                 log.info("Loaded ontology is consistent");
             } else {
-                log.severe( "Loaded ontology is not consistent, fix it and try again!");
+                log.severe("Loaded ontology is not consistent, fix it and try again!");
                 throw new Exception("Ontology is not consistent");
             }
         }
@@ -105,10 +104,10 @@ public class JenaHelpers {
         InfModel infModel = ModelFactory.createOntologyModel(ontModelSpec, targetModel);
         ValidityReport validityReport = infModel.validate();
 
-        if ( !validityReport.isValid() ) {
+        if (!validityReport.isValid()) {
             log.fine("Ontology is not consistent");
             Iterator<ValidityReport.Report> iter = validityReport.getReports();
-            while ( iter.hasNext() ) {
+            while (iter.hasNext()) {
                 ValidityReport.Report report = iter.next();
                 log.info(report.toString());
             }
@@ -117,7 +116,7 @@ public class JenaHelpers {
             dataset.end();
             return false;
         } else {
-            log.fine( "Ontology is consistent");
+            log.fine("Ontology is consistent");
             dataset.commit();
             dataset.end();
 
@@ -145,7 +144,7 @@ public class JenaHelpers {
             if (sparqlQueryString.toLowerCase().contains("select")) {
                 executeSelect = true;
             }
-        } catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         if (executeSelect) {
@@ -155,9 +154,9 @@ public class JenaHelpers {
             String migration = "# MIGRACIJA" + '\n';
             if (!sparqlQueryString.contains(migration)) {
                 // Adds metadata to SPARQL migrations
-                String dateString = "# DATUM: "+new Date()+'\n';
-                String saltString = "# SOL: "+RandomStringUtils.randomAlphanumeric(30) + '\n';
-                String migrationFileContents = migration+dateString+saltString+sparqlQueryString;
+                String dateString = "# DATUM: " + new Date() + '\n';
+                String saltString = "# SOL: " + RandomStringUtils.randomAlphanumeric(30) + '\n';
+                String migrationFileContents = migration + dateString + saltString + sparqlQueryString;
                 Files.write(Paths.get(SPARQLQueryFileLocation), migrationFileContents.getBytes(StandardCharsets.UTF_8));
             }
 
@@ -177,10 +176,10 @@ public class JenaHelpers {
                 QuerySolution soln = results.nextSolution();
                 log.info(soln.toString());
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }  finally {
+        } finally {
             queryExec.close();
         }
         dataset.end();
@@ -224,11 +223,11 @@ public class JenaHelpers {
         dataset.begin(ReadWrite.READ);
         Iterator bagStatements = SPARQLMigrationsResource.listProperties();
         ArrayList<String> migrationCIDsInBag = new ArrayList<>();
-        while(bagStatements.hasNext()) {
+        while (bagStatements.hasNext()) {
             Statement next = (Statement) bagStatements.next();
             migrationCIDsInBag.add(next.getLiteral().toString());
         }
-        log.info("Migrations already ran will be skipped: "+migrationCIDsInBag);
+        log.info("Migrations already ran will be skipped: " + migrationCIDsInBag);
         dataset.end();
     }
 
@@ -285,7 +284,7 @@ public class JenaHelpers {
 
     public void executeSPARQLMigrationForDBSync(String sparqlMigrationCID, String locationOfSparql) {
         File f = new File(locationOfSparql);
-        if(f.exists() && !f.isDirectory()) {
+        if (f.exists() && !f.isDirectory()) {
             if (hasMigrationBeenRanAlready(sparqlMigrationCID)) return;
             dataset.begin(ReadWrite.WRITE);
             log.info("[Executing SPARQL migration from query file (.rq)] " + locationOfSparql);

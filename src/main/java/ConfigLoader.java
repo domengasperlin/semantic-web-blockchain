@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 public class ConfigLoader {
     Map<String, Object> data;
     private static final Logger log = Logger.getLogger(ConfigLoader.class.getName());
+
     public ConfigLoader(String path) {
         try {
             InputStream inputStream = new FileInputStream(new File(path));
@@ -23,25 +24,25 @@ public class ConfigLoader {
     }
 
     public Boolean isDevelopment() {
-        String ethereumNodeAddress = (String)getEthereum().get("naslovVozlisca");
+        String ethereumNodeAddress = (String) getEthereum().get("naslovVozlisca");
         return ethereumNodeAddress.contains("localhost");
     }
 
     public Boolean uporabiSklepanje() {
-        Boolean uporabiSklepanje = (Boolean)getOntology().get("uporabiSklepanje");
+        Boolean uporabiSklepanje = (Boolean) getOntology().get("uporabiSklepanje");
         return uporabiSklepanje;
     }
 
     public Map<String, Object> getOntology() {
-        return (Map<String, Object>)data.get("ontologija");
+        return (Map<String, Object>) data.get("ontologija");
     }
 
     public Map<String, Object> getIPFS() {
-        return (Map<String, Object>)data.get("IPFS");
+        return (Map<String, Object>) data.get("IPFS");
     }
 
     public Map<String, Object> getEthereum() {
-        return (Map<String, Object>)data.get("Ethereum");
+        return (Map<String, Object>) data.get("Ethereum");
     }
 
     public String getABoxFilePath() {
@@ -63,7 +64,7 @@ public class ConfigLoader {
                 return el.get("tbox");
             }
         }
-        log.severe( "Dump files must contain rbox, abox, tbox files");
+        log.severe("Dump files must contain rbox, abox, tbox files");
         return null;
     }
 

@@ -33,7 +33,7 @@ public class Demo {
                 // Retrieve IPFS content identifiers from Ethereum
                 ArrayList<String> inputOntologyFilesFromBlockchains = new ArrayList<>();
                 BigInteger inputOntologiesLength = ethereumHelpers.getContract().pridobiDolzinoVhodnihOntologij().send();
-                for(BigInteger i = BigInteger.ZERO; i.compareTo(inputOntologiesLength) < 0; i = i.add(BigInteger.ONE)) {
+                for (BigInteger i = BigInteger.ZERO; i.compareTo(inputOntologiesLength) < 0; i = i.add(BigInteger.ONE)) {
                     String inputOntologyCID = ethereumHelpers.getContract().pridobiVhodnoOntologijo(i).send();
                     String inputOntologyPath = restoredOntologiesDirectory.replace("$CID", inputOntologyCID);
                     // Download ontology from IPFS
@@ -50,7 +50,7 @@ public class Demo {
 
         // Download all not run SPARQL migrations
         BigInteger sparqlMigrations = ethereumHelpers.getContract().pridobiDolzinoMigracij().send();
-        for(BigInteger i = BigInteger.ZERO; i.compareTo(sparqlMigrations) < 0; i = i.add(BigInteger.ONE)) {
+        for (BigInteger i = BigInteger.ZERO; i.compareTo(sparqlMigrations) < 0; i = i.add(BigInteger.ONE)) {
             String sparqlMigrationCID = ethereumHelpers.getContract().pridobiMigracijo(i).send();
             String sparqlMigrationLocation = sparqlMigrationDirectory.replace("$CID", sparqlMigrationCID);
             if (jenaHelpers.hasMigrationBeenRanAlready(sparqlMigrationCID)) continue;

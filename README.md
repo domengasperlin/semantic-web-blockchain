@@ -39,12 +39,10 @@ java -cp classes/ edu.lehigh.swat.bench.uba.Generator -univ 1 -seed 0 -onto http
 [tdbloader](https://jena.apache.org/documentation/tdb/commands.html#installation)
 Load toy ontology 
 ```bash
-tdb2.tdbloader --loc ./target/dataset ./ipfs-files/output/abox-axioms.ttl
-tdb2.tdbloader --loc ./target/dataset ./ipfs-files/output/tbox-axioms.ttl
-tdb2.tdbloader --loc ./target/dataset ./ipfs-files/output/rbox-axioms.ttl
+tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/ontologija-izobrazevanje/izobrazevanje.ttl
 ```
 or subset of DBpedia
 ```bash
-tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/input/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz 
-tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/input/TBox_DBpedia_ontology_type=parsed.xml
+tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/ontologija-dbpedia/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz 
+tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/ontologija-dbpedia/TBox_DBpedia_ontology_type=parsed.xml
 ```

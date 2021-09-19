@@ -11,10 +11,12 @@ import java.nio.file.Paths;
 
 public class IPFSHelpers {
     IPFS ipfs;
+
     public IPFSHelpers(ConfigLoader configLoader) {
         String IPFSNodeAddress = (String) configLoader.getIPFS().get("naslovVozlisca");
         this.ipfs = new IPFS(IPFSNodeAddress);
     }
+
     public Multihash uploadLocalFileToIPFS(String fileName) {
         Multihash hash = null;
         try {
@@ -56,7 +58,7 @@ public class IPFSHelpers {
         Multihash filePointer = Multihash.fromBase58(cid);
         try {
             byte[] fileContents = ipfs.cat(filePointer);
-            Files.write( Paths.get(fileName), fileContents);
+            Files.write(Paths.get(fileName), fileContents);
         } catch (IOException e) {
             e.printStackTrace();
         }
