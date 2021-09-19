@@ -28,12 +28,12 @@ public class Demo {
             ethereumHelpers.loadContractAtAddress(jenaHelpers.retrieveEthContractAddressFromRDFDatabase());
             // FRESH OF RDF DATABASE: Downloads input ontologies from blockchains to folder and then loads them in Jena
             if (inputOntologyFiles == null) {
-                // TODO: assuming ttl ending
-                String restoredOntologiesDirectory = "rdf-sparql/ontologija-obnovljena/vhodna-ontologija-$CID.ttl";
                 // Retrieve IPFS content identifiers from Ethereum
                 ArrayList<String> inputOntologyFilesFromBlockchains = new ArrayList<>();
                 BigInteger inputOntologiesLength = ethereumHelpers.getContract().pridobiDolzinoVhodnihOntologij().send();
                 for (BigInteger i = BigInteger.ZERO; i.compareTo(inputOntologiesLength) < 0; i = i.add(BigInteger.ONE)) {
+                    // TODO: assuming ttl ending
+                    String restoredOntologiesDirectory = "rdf-sparql/ontologija-obnovljena/vhodna-ontologija-$CID.ttl";
                     String inputOntologyCID = ethereumHelpers.getContract().pridobiVhodnoOntologijo(i).send();
                     String inputOntologyPath = restoredOntologiesDirectory.replace("$CID", inputOntologyCID);
                     // Download ontology from IPFS
