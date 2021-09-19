@@ -66,7 +66,7 @@ public class JenaHelpers {
         dataset.end();
     }
 
-    public void loadInputOntologiesIFEmptyDatasetIFReasonerConsistencyCheckInfModelAdd(ArrayList<String> inputOntologyFiles) throws Exception {
+    public void loadInputOntologiesIFEmptyDatasetIFReasonerConsistencyCheckInfModelAdd(ArrayList<String> inputOntologyFiles, Timers timers) throws Exception {
         dataset.begin(ReadWrite.READ);
         boolean isModelEmpty = this.model.isEmpty();
         dataset.end();
@@ -74,14 +74,19 @@ public class JenaHelpers {
         if (isModelEmpty) {
             for (String inputOntologyFileName : inputOntologyFiles) {
                 if (inputOntologyFileName != null) {
+                    String timerLoadOntology = timers.start("J. Nalozi ontologijo "+inputOntologyFileName+" v Jena bazo");
                     Txn.executeWrite(dataset, () -> RDFDataMgr.read(dataset, inputOntologyFileName));
+                    timers.stop(timerLoadOntology);
                 }
             }
         }
 
         if (useReasoner) {
             dataset.begin(ReadWrite.WRITE);
-            if (isOntologyConsistent(this.model, useReasoner)) {
+            String timerWouldOntologyBeConsistent = timers.start("J. Preveri ce se ohranja konsistenost ontologije");
+            Boolean isConsistent = isOntologyConsistent(this.model, useReasoner);
+            timers.stop(timerWouldOntologyBeConsistent);
+            if (isConsistent) {
                 log.info("Loaded ontology is consistent");
             } else {
                 log.severe("Loaded ontology is not consistent, fix it and try again!");
@@ -90,11 +95,13 @@ public class JenaHelpers {
         }
     }
 
-    public void purgeJenaModel() {
+    public void purgeJenaModel(Timers timers) {
+        String timerPurge = timers.start("P. Brisanje Jena baze");
         dataset.begin(ReadWrite.WRITE);
         this.model.removeAll();
         dataset.commit();
         dataset.end();
+        timers.stop(timerPurge);
     }
 
     public Boolean isOntologyConsistent(Model targetModel, Boolean addInferenceModelFromReasoner) {
@@ -130,7 +137,7 @@ public class JenaHelpers {
         return true;
     }
 
-    public Boolean executeSPARQL(String SPARQLQueryFileLocation, ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) throws IOException {
+    public Boolean executeSPARQL(String SPARQLQueryFileLocation, ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers, Timers timers) throws IOException {
         File file = new File(SPARQLQueryFileLocation);
         Boolean executeSelect = false;
         String sparqlQueryString = "";
@@ -160,7 +167,7 @@ public class JenaHelpers {
                 Files.write(Paths.get(SPARQLQueryFileLocation), migrationFileContents.getBytes(StandardCharsets.UTF_8));
             }
 
-            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, sparqlQueryString, ipfsHelpers, inputOntologyFiles, ethereumHelpers);
+            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, sparqlQueryString, ipfsHelpers, inputOntologyFiles, ethereumHelpers, timers);
         }
 
     }
@@ -186,20 +193,25 @@ public class JenaHelpers {
         return true;
     }
 
-    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, String sparqlString, IPFSHelpers ipfsHelpers, ArrayList<String> inputOntologyFiles, EthereumHelpers ethereumHelpers) {
+    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, String sparqlString, IPFSHelpers ipfsHelpers, ArrayList<String> inputOntologyFiles, EthereumHelpers ethereumHelpers, Timers timers) {
         dataset.begin(ReadWrite.WRITE);
+        String timerRdfExecuteSPARQL = timers.start("4.x Izvedi SPARQL posodobitev nad bazo RDF");
         UpdateAction.parseExecute(sparqlString, this.model);
 
         if (this.useReasoner) {
+            String timerWouldOntologyBeConsistent = timers.start("4.x Preveri ce se ohranja konsistenost ontologije");
             // TODO: handle duplicate inferences that would be added to the model if we pass true here. UPDATE?
-            if (!isOntologyConsistent(this.model, false)) {
+            Boolean isConsistent = isOntologyConsistent(this.model, false);
+            timers.stop(timerWouldOntologyBeConsistent);
+            if (!isConsistent) {
                 return false;
             }
         } else {
             dataset.commit();
             dataset.end();
         }
-        uploadChangesToBlockchains(locationOfSPARQL, ipfsHelpers, ethereumHelpers);
+        timers.stop(timerRdfExecuteSPARQL);
+        uploadChangesToBlockchains(locationOfSPARQL, ipfsHelpers, ethereumHelpers, timers);
         return true;
 
     }
@@ -250,26 +262,37 @@ public class JenaHelpers {
         }
     }
 
-    public void uploadInputOntologyFilesToBlockchains(ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+    public void uploadInputOntologyFilesToBlockchains(ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers, Timers timers) {
+        int i = 0;
         for (String inputOntologyFile : inputOntologyFiles) {
+            String timerInputOntologyToIPFS = timers.start("2."+i+" Objava vhodne ontologije na IPFS");
             String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(inputOntologyFile).toString();
+            timers.stop(timerInputOntologyToIPFS);
             log.info("[IPFS upload content identifier] " + xBoxCID);
             try {
+                String timerPostCIDToETH = timers.start("2."+i+" Objava CID-a vhodne ontologije na ETH");
                 TransactionReceipt transaction = ethereumHelpers.getContract().dodajVhodnoOntologijo(xBoxCID).send();
+                timers.stop(timerPostCIDToETH);
                 log.info("[ETH] transaction: " + transaction.getTransactionHash());
+                Timers.addDataToCSV("2."+i+" Objava CID-a vhodne ontologije na ETH", transaction.getGasUsed().toString(), "gas");
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            i++;
         }
     }
 
-    public void uploadChangesToBlockchains(String locationOfSparql, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
+    public void uploadChangesToBlockchains(String locationOfSparql, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers, Timers timers) {
+        String timerUploadMigrationToIPFS = timers.start("4.x Nalozi migracijo na IPFS");
         String sparqlQueryCID = ipfsHelpers.uploadLocalFileToIPFS(locationOfSparql).toString();
+        timers.stop(timerUploadMigrationToIPFS);
         if (hasMigrationBeenRanAlready(sparqlQueryCID)) {
             return;
         }
         try {
+            String addMigrationCIDToETH = timers.start("4.x Nalozi CID migracije na ETH");
             ethereumHelpers.getContract().dodajMigracijo(sparqlQueryCID).send();
+            timers.stop(addMigrationCIDToETH);
             saveRanSparqlMigrationToRDFDatabase(sparqlQueryCID);
         } catch (Exception e) {
             e.printStackTrace();
