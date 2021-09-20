@@ -46,3 +46,6 @@ or subset of DBpedia
 tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/ontologija-dbpedia/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz 
 tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/ontologija-dbpedia/TBox_DBpedia_ontology_type=parsed.xml
 ```
+
+### Run program
+set heap space big enough to input ontology files e.g. -ea -Xmx2048m
