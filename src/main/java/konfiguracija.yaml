@@ -1,26 +1,27 @@
 ontologija:
   naloziIzDatotek:
 #---IZOBRAZEVANJE---
-    - rdf-sparql/ontologija-izobrazevanje/izobrazevanje.ttl
+#    - rdf-sparql/ontologija-izobrazevanje/izobrazevanje.ttl
 #---DBPEDIA---
-   #- rdf-sparql/ontologija-dbpedia/TBox_DBpedia_ontology_type=parsed.xml
+   - rdf-sparql/ontologija-dbpedia/TBox_DBpedia_ontology_type=parsed.xml
+   - rdf-sparql/ontologija-dbpedia/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz
   poizvedbeSPARQL:
 #---IZOBRAZEVANJE---
-    - rdf-sparql/poizvedbe-izobrazevanje/select-abox.ru
-    - rdf-sparql/poizvedbe-izobrazevanje/delete-abox.ru
-    - rdf-sparql/poizvedbe-izobrazevanje/insert-abox.ru
-    - rdf-sparql/poizvedbe-izobrazevanje/delete-tbox.ru
-    - rdf-sparql/poizvedbe-izobrazevanje/insert-tbox.ru
-    - rdf-sparql/poizvedbe-izobrazevanje/select-test-inference.ru
+#    - rdf-sparql/poizvedbe-izobrazevanje/select-abox.ru
+#    - rdf-sparql/poizvedbe-izobrazevanje/delete-abox.ru
+#    - rdf-sparql/poizvedbe-izobrazevanje/insert-abox.ru
+#    - rdf-sparql/poizvedbe-izobrazevanje/delete-tbox.ru
+#    - rdf-sparql/poizvedbe-izobrazevanje/insert-tbox.ru
+#    - rdf-sparql/poizvedbe-izobrazevanje/select-test-inference.ru
 #    - rdf-sparql/poizvedbe-izobrazevanje/insert-abox-inconsistent.ru
 #---DBPEDIA---
-#    - rdf-sparql/poizvedbe-dbpedia/select-dbpedia-abox.ru
-#    - rdf-sparql/poizvedbe-dbpedia/delete-dbpedia-abox.ru
-#    - rdf-sparql/poizvedbe-dbpedia/insert-dbpedia-abox.ru
-#    - rdf-sparql/poizvedbe-dbpedia/delete-dbpedia-tbox.ru
-#    - rdf-sparql/poizvedbe-dbpedia/insert-dbpedia-tbox.ru
-#    - rdf-sparql/poizvedbe-dbpedia/select-dbpedia-tbox.ru
-  uporabiSklepanje: true
+    - rdf-sparql/poizvedbe-dbpedia/select-dbpedia-abox.ru
+    - rdf-sparql/poizvedbe-dbpedia/delete-dbpedia-abox.ru
+    - rdf-sparql/poizvedbe-dbpedia/insert-dbpedia-abox.ru
+    - rdf-sparql/poizvedbe-dbpedia/delete-dbpedia-tbox.ru
+    - rdf-sparql/poizvedbe-dbpedia/insert-dbpedia-tbox.ru
+    - rdf-sparql/poizvedbe-dbpedia/select-dbpedia-tbox.ru
+  uporabiSklepanje: false
 IPFS:
   naslovVozlisca: /ip4/127.0.0.1/tcp/5001
 Ethereum:
@@ -28,6 +29,6 @@ Ethereum:
   naslovVozlisca: http://localhost:7545
   zasebniKljucDenarnice: 97b3900860ef91192f7cdfe3a9268bd2e9c6a245994d513297dcf7e0a1d55d32
 #---RINKEBY---
-  #naslovVozlisca: https://rinkeby.infura.io/v3/18b69a4069f7455ba4486efd1f5530b1
-  #lokacijaDenarnice: ethereum/wallet--c261cf8e7283030d0b6fa672b5d15819c8d99aa3
-  #gesloDenarnice: demo
+#  naslovVozlisca: https://rinkeby.infura.io/v3/18b69a4069f7455ba4486efd1f5530b1
+#  lokacijaDenarnice: ethereum/wallet--c261cf8e7283030d0b6fa672b5d15819c8d99aa3
+#  gesloDenarnice: demo
