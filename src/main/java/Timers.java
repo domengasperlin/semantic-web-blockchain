@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class Timers {
 
-    private static int convertToMs = 1000;
+    private static int convertToMs = 1000000;
     private static HashMap<String, Long> startTimes = new HashMap<>();
     private static CSVWriter writer;
 
@@ -36,7 +36,7 @@ public class Timers {
     public void stop(String nameOfTimerAndOperation) {
         Long startTime = startTimes.get(nameOfTimerAndOperation);
         startTimes.remove(nameOfTimerAndOperation);
-        long elapsed = (System.nanoTime() - startTime) / convertToMs;
+        long elapsed = (System.nanoTime() - startTime.longValue()) / convertToMs;
         addDataToCSV(nameOfTimerAndOperation, String.valueOf(elapsed), "ms");
     }
 
