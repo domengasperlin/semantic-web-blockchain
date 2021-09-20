@@ -8,6 +8,7 @@ public class Demo {
 
     public static void main(String[] args) throws Exception {
         Timers timers = new Timers();
+        String totalTimeOfProgram = timers.start("Skupni cas izvajanja programa");
 
         ConfigLoader configLoader = new ConfigLoader("src/main/java/konfiguracija.yaml");
         ArrayList<String> inputOntologyFiles = (ArrayList<String>) configLoader.getOntology().get("naloziIzDatotek");
@@ -93,6 +94,7 @@ public class Demo {
             // jenaHelpers.printDatasetToStandardOutput();
         }
 
+        timers.stop(totalTimeOfProgram);
         Timers.closeWriter();
     }
 
