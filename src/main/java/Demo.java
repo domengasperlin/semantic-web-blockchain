@@ -87,7 +87,8 @@ public class Demo {
             Boolean successful = jenaHelpers.executeSPARQL(query, inputOntologyFiles, ipfsHelpers, ethereumHelpers, timers);
             timers.stop(timerExecuteSPARQLQuery);
             if (!successful) {
-                log.warning("SPARQL query wasn't applied to the dataset");
+                log.warning("SPARQL query wasn't applied to the dataset. Finishing program execution.");
+                break;
             }
             i++;
             // jenaHelpers.printDatasetToStandardOutput();

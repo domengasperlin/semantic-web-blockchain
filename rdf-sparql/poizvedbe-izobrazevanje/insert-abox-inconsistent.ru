@@ -1,6 +1,3 @@
-# MIGRACIJA
-# DATUM: Wed Sep 29 11:21:43 CEST 2021
-# SOL: LiHJl3oU9ITiLYOLQtYQ50EPCzE9PS
 prefix : <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#>
 prefix owl: <http://www.w3.org/2002/07/owl#>
 prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
