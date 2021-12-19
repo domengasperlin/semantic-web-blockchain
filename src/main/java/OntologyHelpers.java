@@ -33,6 +33,25 @@ public class OntologyHelpers {
 //        engine = QueryEngine.create(manager, reasoner, true);
     }
 
+    public static Boolean convertOntologyFormat(String ontologyLocation, String outputFile, OWLDocumentFormat owlDocumentFormat) {
+        OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+        OWLOntology owlOntology = null;
+        try {
+            owlOntology = manager.loadOntologyFromOntologyDocument(new File(ontologyLocation));
+        } catch (OWLOntologyCreationException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        try {
+            File outputOntology = new File(outputFile);
+            owlOntology.saveOntology(owlDocumentFormat, IRI.create(outputOntology.toURI()));
+        } catch (OWLOntologyStorageException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     public OWLDocumentFormat chooseCorrectFormat(String fileName) {
         if (fileName.contains("ttl")) {
             return new TurtleDocumentFormat();

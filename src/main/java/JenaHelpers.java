@@ -61,6 +61,7 @@ public class JenaHelpers {
 
         dataset.begin(ReadWrite.READ);
         this.model = dataset.getDefaultModel();
+        // Model difference = this.model.difference();
 //        ModelChangedListener modelChangedListener = new ModelListener();
 //        this.model.register(modelChangedListener);
         dataset.end();
@@ -83,9 +84,7 @@ public class JenaHelpers {
 
         if (useReasoner) {
             dataset.begin(ReadWrite.WRITE);
-            String timerWouldOntologyBeConsistent = timers.start("J. Preveri ce se ohranja konsistenost ontologije");
-            Boolean isConsistent = isOntologyConsistent(this.model, useReasoner);
-            timers.stop(timerWouldOntologyBeConsistent);
+            Boolean isConsistent = isOntologyConsistent(this.model, useReasoner, timers);
             if (isConsistent) {
                 log.info("Loaded ontology is consistent");
             } else {
@@ -104,13 +103,15 @@ public class JenaHelpers {
         timers.stop(timerPurge);
     }
 
-    public Boolean isOntologyConsistent(Model targetModel, Boolean addInferenceModelFromReasoner) {
+    public Boolean isOntologyConsistent(Model targetModel, Boolean addInferenceModelFromReasoner, Timers timers) {
+        OntModelSpec reasonerSpec = OntModelSpec.RDFS_MEM;
+        String timerWouldOntologyBeConsistent = timers.start("J. Pridobi tranzitivne zakonitosti in preveri konsistenostnost ontologij "+reasonerSpec.getLanguage());
         Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
-        OntModelSpec ontModelSpec = new OntModelSpec(OntModelSpec.RDFS_MEM);
+        OntModelSpec ontModelSpec = new OntModelSpec(reasonerSpec);
         ontModelSpec.setReasoner(reasoner);
         InfModel infModel = ModelFactory.createOntologyModel(ontModelSpec, targetModel);
         ValidityReport validityReport = infModel.validate();
-
+        timers.stop(timerWouldOntologyBeConsistent);
         if (!validityReport.isValid()) {
             log.fine("Ontology is not consistent");
             Iterator<ValidityReport.Report> iter = validityReport.getReports();
@@ -128,10 +129,12 @@ public class JenaHelpers {
             dataset.end();
 
             if (addInferenceModelFromReasoner) {
+                String timerAddInferredAxioms = timers.start("J. Dodaj tranzitivne zakonitosti v Jena bazo");
                 dataset.begin(ReadWrite.WRITE);
                 this.model.add(infModel);
                 dataset.commit();
                 dataset.end();
+                timers.stop(timerAddInferredAxioms);
             }
         }
         return true;
@@ -165,6 +168,10 @@ public class JenaHelpers {
                 String saltString = "# SOL: " + RandomStringUtils.randomAlphanumeric(30) + '\n';
                 String migrationFileContents = migration + dateString + saltString + sparqlQueryString;
                 Files.write(Paths.get(SPARQLQueryFileLocation), migrationFileContents.getBytes(StandardCharsets.UTF_8));
+            } else {
+                // Skipping SPARQL query because it has already been executed on the database
+                log.warning("Migration was already executed");
+                return false;
             }
 
             return executeSPARQLUpdateAction(SPARQLQueryFileLocation, sparqlQueryString, ipfsHelpers, inputOntologyFiles, ethereumHelpers, timers);
@@ -199,10 +206,8 @@ public class JenaHelpers {
         UpdateAction.parseExecute(sparqlString, this.model);
 
         if (this.useReasoner) {
-            String timerWouldOntologyBeConsistent = timers.start("4.x Preveri ce se ohranja konsistenost ontologije");
             // TODO: handle duplicate inferences that would be added to the model if we pass true here. UPDATE?
-            Boolean isConsistent = isOntologyConsistent(this.model, false);
-            timers.stop(timerWouldOntologyBeConsistent);
+            Boolean isConsistent = isOntologyConsistent(this.model, false, timers);
             if (!isConsistent) {
                 return false;
             }
@@ -274,7 +279,7 @@ public class JenaHelpers {
                 TransactionReceipt transaction = ethereumHelpers.getContract().dodajVhodnoOntologijo(xBoxCID).send();
                 timers.stop(timerPostCIDToETH);
                 log.info("[ETH] transaction: " + transaction.getTransactionHash());
-                Timers.addDataToCSV("2."+i+" Objava CID-a vhodne ontologije na ETH", transaction.getGasUsed().toString(), "gas");
+                Timers.addDataToCSV("2."+i+" Objava CID-a vhodne ontologije na ETH", transaction.getGasUsed().toString(), "plin");
             } catch (Exception e) {
                 e.printStackTrace();
             }

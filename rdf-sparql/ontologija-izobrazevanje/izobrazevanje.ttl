@@ -1,4 +1,4 @@
-@prefix : <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#> .
+@prefix : <http://www.example.com/izobrazevanje#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
@@ -13,13 +13,13 @@
 #    Object Properties
 #################################################################
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaPredavatelja
+###  http://www.example.com/izobrazevanje#imaPredavatelja
 :imaPredavatelja rdf:type owl:ObjectProperty ;
                  rdfs:subPropertyOf owl:topObjectProperty ;
                  owl:inverseOf :predava .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan
+###  http://www.example.com/izobrazevanje#jeVpisan
 :jeVpisan rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf owl:topObjectProperty ;
           rdf:type owl:FunctionalProperty ,
@@ -28,7 +28,7 @@
           rdfs:range :Letnik .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeČlanica
+###  http://www.example.com/izobrazevanje#jeČlanica
 :jeČlanica rdf:type owl:ObjectProperty ;
            rdfs:subPropertyOf owl:topObjectProperty ;
            rdf:type owl:ReflexiveProperty ;
@@ -36,7 +36,7 @@
            rdfs:range :Univerza .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#obiskuje
+###  http://www.example.com/izobrazevanje#obiskuje
 :obiskuje rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf owl:topObjectProperty ;
           rdf:type owl:AsymmetricProperty ;
@@ -44,7 +44,7 @@
           rdfs:range :Predmet .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#predava
+###  http://www.example.com/izobrazevanje#predava
 :predava rdf:type owl:ObjectProperty ;
          rdfs:subPropertyOf owl:topObjectProperty ;
          rdf:type owl:AsymmetricProperty ;
@@ -52,7 +52,7 @@
          rdfs:range :Predmet .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#seIzvaja
+###  http://www.example.com/izobrazevanje#seIzvaja
 :seIzvaja rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf owl:topObjectProperty ;
           rdfs:domain :Študij ;
@@ -63,14 +63,14 @@
 #    Data properties
 #################################################################
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#imaVpisnoŠtevilko
+###  http://www.example.com/izobrazevanje#imaVpisnoŠtevilko
 :imaVpisnoŠtevilko rdf:type owl:DatatypeProperty ;
                    rdfs:subPropertyOf owl:topDataProperty ;
                    rdfs:domain :Študent ;
                    rdfs:range xsd:integer .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeBruc
+###  http://www.example.com/izobrazevanje#jeBruc
 :jeBruc rdf:type owl:DatatypeProperty ;
         rdfs:subPropertyOf owl:topDataProperty ;
         rdfs:domain :Študent ;
@@ -81,43 +81,43 @@
 #    Classes
 #################################################################
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Dodiplomski
+###  http://www.example.com/izobrazevanje#Dodiplomski
 :Dodiplomski rdf:type owl:Class ;
              rdfs:subClassOf :Študij .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta
+###  http://www.example.com/izobrazevanje#Fakulteta
 :Fakulteta rdf:type owl:Class ;
            rdfs:subClassOf :Univerza .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Letnik
+###  http://www.example.com/izobrazevanje#Letnik
 :Letnik rdf:type owl:Class .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Podiplomski
+###  http://www.example.com/izobrazevanje#Podiplomski
 :Podiplomski rdf:type owl:Class ;
              rdfs:subClassOf :Študij .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Predmet
+###  http://www.example.com/izobrazevanje#Predmet
 :Predmet rdf:type owl:Class .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Profesor
+###  http://www.example.com/izobrazevanje#Profesor
 :Profesor rdf:type owl:Class ;
           owl:disjointWith :Študent .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza
+###  http://www.example.com/izobrazevanje#Univerza
 :Univerza rdf:type owl:Class .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študent
+###  http://www.example.com/izobrazevanje#Študent
 :Študent rdf:type owl:Class .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Študij
+###  http://www.example.com/izobrazevanje#Študij
 :Študij rdf:type owl:Class .
 
 
@@ -125,24 +125,24 @@
 #    Individuals
 #################################################################
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Drugi_letnik
+###  http://www.example.com/izobrazevanje#Drugi_letnik
 :Drugi_letnik rdf:type owl:NamedIndividual ,
                        :Letnik .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Fakulteta_za_računalništvo_in_informatiko
+###  http://www.example.com/izobrazevanje#Fakulteta_za_računalništvo_in_informatiko
 :Fakulteta_za_računalništvo_in_informatiko rdf:type owl:NamedIndividual ,
                                                     :Fakulteta ;
                                            :jeČlanica :Univerza_v_Ljubljani .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Franc_Horvat
+###  http://www.example.com/izobrazevanje#Franc_Horvat
 :Franc_Horvat rdf:type owl:NamedIndividual ,
                        :Profesor ;
               :predava :Obdelava_naravnega_jezika .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Janez_Novak
+###  http://www.example.com/izobrazevanje#Janez_Novak
 :Janez_Novak rdf:type owl:NamedIndividual ,
                       :Študent ;
              :jeVpisan :Prvi_letnik ;
@@ -151,35 +151,35 @@
              :jeBruc "true"^^xsd:boolean .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Obdelava_naravnega_jezika
+###  http://www.example.com/izobrazevanje#Obdelava_naravnega_jezika
 :Obdelava_naravnega_jezika rdf:type owl:NamedIndividual ,
                                     :Predmet .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Prvi_letnik
+###  http://www.example.com/izobrazevanje#Prvi_letnik
 :Prvi_letnik rdf:type owl:NamedIndividual ,
                       :Letnik .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Tretji_letnik
+###  http://www.example.com/izobrazevanje#Tretji_letnik
 :Tretji_letnik rdf:type owl:NamedIndividual ,
                         :Letnik .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Univerza_v_Ljubljani
+###  http://www.example.com/izobrazevanje#Univerza_v_Ljubljani
 :Univerza_v_Ljubljani rdf:type owl:NamedIndividual ,
                                :Univerza .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(UNI)
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(UNI)> rdf:type owl:NamedIndividual ,
+###  http://www.example.com/izobrazevanje#Računalništvo_in_informatika_(UNI)
+<http://www.example.com/izobrazevanje#Računalništvo_in_informatika_(UNI)> rdf:type owl:NamedIndividual ,
                                                                                                                :Dodiplomski ,
                                                                                                                :Podiplomski ;
                                                                                                       :seIzvaja :Fakulteta_za_računalništvo_in_informatiko .
 
 
-###  http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(VS)
-<http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Računalništvo_in_informatika_(VS)> rdf:type owl:NamedIndividual ,
+###  http://www.example.com/izobrazevanje#Računalništvo_in_informatika_(VS)
+<http://www.example.com/izobrazevanje#Računalništvo_in_informatika_(VS)> rdf:type owl:NamedIndividual ,
                                                                                                               :Dodiplomski ,
                                                                                                               :Podiplomski ;
                                                                                                      :seIzvaja :Fakulteta_za_računalništvo_in_informatiko .
