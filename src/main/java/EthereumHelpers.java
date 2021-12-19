@@ -29,7 +29,7 @@ public class EthereumHelpers {
             gasPrice = new DefaultGasProvider().getGasPrice();
         }
         Timers.addDataToCSV("0 Omejitev Plina", gasLimit.toString(), "plin");
-        Timers.addDataToCSV("0 Cena Plina", gasLimit.toString(), "plin");
+        Timers.addDataToCSV("0 Cena Plina", gasPrice.toString(), "plin");
         loadWalletCredentials(configLoader);
     }
 
