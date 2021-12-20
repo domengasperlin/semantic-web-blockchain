@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 
-public class Timers {
+public class Timer {
 
     private static int convertToMs = 1000000;
     private static HashMap<String, Long> startTimes = new HashMap<>();
     private static CSVWriter writer;
+
+    private static Timer timer = null;
 
     private static void writeHeader() {
         try {
@@ -24,8 +26,15 @@ public class Timers {
         }
     }
 
-    public Timers() {
+    private Timer() {
         writeHeader();
+    }
+
+    public static Timer getInstance() {
+        if (timer == null) {
+            timer = new Timer();
+        }
+        return timer;
     }
 
     public String start(String nameOfTimerAndOperation) {

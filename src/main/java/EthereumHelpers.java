@@ -16,6 +16,7 @@ public class EthereumHelpers {
     private BigInteger gasPrice;
     Shramba storageContract;
     private static final Logger log = Logger.getLogger(EthereumHelpers.class.getName());
+    private static Timer timer = Timer.getInstance();
 
     public EthereumHelpers(ConfigLoader configLoader) {
         String ethereumNodeAddress = (String) configLoader.getEthereum().get("naslovVozlisca");
@@ -28,8 +29,8 @@ public class EthereumHelpers {
             gasLimit = new DefaultGasProvider().getGasLimit();
             gasPrice = new DefaultGasProvider().getGasPrice();
         }
-        Timers.addDataToCSV("0 Omejitev Plina", gasLimit.toString(), "plin");
-        Timers.addDataToCSV("0 Cena Plina", gasPrice.toString(), "plin");
+        Timer.addDataToCSV("0 Omejitev Plina", gasLimit.toString(), "plin");
+        Timer.addDataToCSV("0 Cena Plina", gasPrice.toString(), "plin");
         loadWalletCredentials(configLoader);
     }
 
@@ -37,6 +38,7 @@ public class EthereumHelpers {
         try {
             Shramba storageContr = Shramba.load(contractAddress, web3, credentials, gasPrice, gasLimit);
             if (storageContr.isValid()) {
+                Timer.addDataToCSV("Naslov pametne pogodbe", contractAddress, "hex");
                 this.storageContract = storageContr;
             }
         } catch (Exception e) {
@@ -65,13 +67,16 @@ public class EthereumHelpers {
     public String deployStorageContract() {
         Shramba helloWorld = null;
         try {
+            String timerPostEthContract = timer.start("1. Objava ETH pogodbe");
             helloWorld = Shramba.deploy(web3, credentials, gasPrice, gasLimit).send();
+            timer.stop(timerPostEthContract);
             storageContract = helloWorld;
         } catch (Exception e) {
             e.printStackTrace();
         }
         String contractAddress = helloWorld.getContractAddress();
         log.info("[ETH] contract address: " + contractAddress);
+        Timer.addDataToCSV("Naslov pametne pogodbe", contractAddress, "hex");
         loadContractAtAddress(contractAddress);
         return contractAddress;
     }
