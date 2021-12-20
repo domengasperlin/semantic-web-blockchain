@@ -20,10 +20,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Scanner;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -257,15 +254,15 @@ public class JenaHelpers {
         return migrationRan;
     }
 
-    public String retrieveEthContractAddressFromRDFDatabase() {
+    public Optional<String> retrieveEthContractAddressFromRDFDatabase() {
+        String ethereumContractAddress = null;
         dataset.begin(ReadWrite.READ);
         Statement property = this.model.getResource(ethContractNamespace).getProperty(hasAddress);
         dataset.end();
         if (property != null) {
-            return property.getLiteral().toString();
-        } else {
-            return null;
+            ethereumContractAddress =  property.getLiteral().toString();
         }
+        return Optional.ofNullable(ethereumContractAddress);
     }
 
     public void uploadInputOntologyFilesToBlockchains(ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {

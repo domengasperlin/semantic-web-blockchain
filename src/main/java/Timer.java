@@ -13,6 +13,7 @@ public class Timer {
     private static CSVWriter writer;
 
     private static Timer timer = null;
+    private static String totalTimeOfProgramTimer = null;
 
     private static void writeHeader() {
         try {
@@ -33,6 +34,8 @@ public class Timer {
     public static Timer getInstance() {
         if (timer == null) {
             timer = new Timer();
+            Timer.addDataToCSV("legenda tipi scenarijev","(zacetni - prazna lokalna baza, nova pogodba), (nadaljevanje - obstoječa baza in pametna pogodba le nove migracije), (sodelovanje - obnovitev lokalne baze iz blockchaina, objava svojih dodatnih lokalnih migracij na blockchain )","string");
+            totalTimeOfProgramTimer = timer.start("Skupni cas izvajanja programa");
         }
         return timer;
     }
@@ -54,7 +57,9 @@ public class Timer {
         writer.writeNext(data1);
     }
 
-    public static void closeWriter() {
+    public static void finish() {
+        timer.stop(totalTimeOfProgramTimer);
+
         try {
             writer.close();
         } catch (IOException e) {

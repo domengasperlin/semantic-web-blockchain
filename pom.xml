@@ -34,11 +34,6 @@
             <version>${org.snakeyaml.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-distribution</artifactId>
-            <version>${owlapi.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.web3j</groupId>
             <artifactId>core</artifactId>
             <version>${web3j.version}</version>

@@ -75,7 +75,7 @@ public class EthereumHelpers {
             e.printStackTrace();
         }
         Long gasUsed = helloWorld.getTransactionReceipt().stream().mapToLong(t -> t.getGasUsed().longValueExact()).sum();
-        Timer.addDataToCSV("Gas used pametna pogodba", gasUsed.toString(), "gas");
+        Timer.addDataToCSV("1. Objava ETH pogodbe", gasUsed.toString(), "gas");
         String contractAddress = helloWorld.getContractAddress();
         log.info("[ETH] contract address: " + contractAddress);
         Timer.addDataToCSV("Naslov pametne pogodbe", contractAddress, "hex");

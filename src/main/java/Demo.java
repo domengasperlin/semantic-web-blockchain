@@ -1,39 +1,43 @@
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 public class Demo {
 
     private static final Logger log = Logger.getLogger(Demo.class.getName());
+    private static final String sparqlMigrationDirectory = "ipfs-files/output/sparql-migration-$CID.ru";
 
     public static void main(String[] args) throws Exception {
+        ScenarioManager.cleanUpIPFS();
+        ScenarioManager.cleanRDFDatabase();
         Timer timer = Timer.getInstance();
-        String totalTimeOfProgram = timer.start("Skupni cas izvajanja programa");
 
         ConfigLoader configLoader = new ConfigLoader("src/main/java/konfiguracija.yaml");
-        ArrayList<String> inputOntologyFiles = (ArrayList<String>) configLoader.getOntology().get("naloziIzDatotek");
-        ArrayList<String> SPARQLQueries = (ArrayList<String>) configLoader.getOntology().get("poizvedbeSPARQL");
-        String sparqlMigrationDirectory = "ipfs-files/output/sparql-migration-$CID.ru";
-
         IPFSHelpers ipfsHelpers = new IPFSHelpers(configLoader);
         EthereumHelpers ethereumHelpers = new EthereumHelpers(configLoader);
 
+        Optional<ArrayList<String>> inputOntologyFiles = Optional.ofNullable((ArrayList<String>) configLoader.getOntology().get("naloziIzDatotek"));
+        ArrayList<String> SPARQLQueries = (ArrayList<String>) configLoader.getOntology().get("poizvedbeSPARQL");
+
         // Connects to Apache Jena dataset, creates empty one if not existent
+        Timer.addDataToCSV("sklepanje", configLoader.uporabiSklepanje().toString(), "boolean");
         JenaHelpers jenaHelpers = new JenaHelpers(configLoader.uporabiSklepanje());
-        String ethereumContractAddress = jenaHelpers.retrieveEthContractAddressFromRDFDatabase();
+        Optional<String> ethereumContractAddress = jenaHelpers.retrieveEthContractAddressFromRDFDatabase();
 
         // Save them on blockchains
-        if (ethereumContractAddress == null && inputOntologyFiles != null) {
-            jenaHelpers.loadInputOntologiesIFEmptyDatasetIFReasonerConsistencyCheckInfModelAdd(inputOntologyFiles);
+        if (!ethereumContractAddress.isPresent() && inputOntologyFiles.isPresent()) {
+            Timer.addDataToCSV("Scenarij", "zacetni", "tip scenarija");
+            jenaHelpers.loadInputOntologiesIFEmptyDatasetIFReasonerConsistencyCheckInfModelAdd(inputOntologyFiles.get());
             String contractAddress = ethereumHelpers.deployStorageContract();
             jenaHelpers.saveEthContractAddressToRDFDatabase(contractAddress);
-
-            jenaHelpers.uploadInputOntologyFilesToBlockchains(inputOntologyFiles, ipfsHelpers, ethereumHelpers);
-        } else if (ethereumContractAddress != null) {
-            String contractAddress = jenaHelpers.retrieveEthContractAddressFromRDFDatabase();
-            ethereumHelpers.loadContractAtAddress(contractAddress);
+            jenaHelpers.uploadInputOntologyFilesToBlockchains(inputOntologyFiles.get(), ipfsHelpers, ethereumHelpers);
+        } else if (ethereumContractAddress.isPresent()) {
+            Optional<String> contractAddress = jenaHelpers.retrieveEthContractAddressFromRDFDatabase();
+            ethereumHelpers.loadContractAtAddress(contractAddress.get());
             // FRESH OF RDF DATABASE: Downloads input ontologies from blockchains to folder and then loads them in Jena
-            if (inputOntologyFiles == null) {
+            if (!inputOntologyFiles.isPresent()) {
+                Timer.addDataToCSV("Scenarij", "sodelovanje", "tip scenarija");
                 // Retrieve IPFS content identifiers from Ethereum
                 ArrayList<String> inputOntologyFilesFromBlockchains = new ArrayList<>();
                 BigInteger inputOntologiesLength = ethereumHelpers.getContract().pridobiDolzinoVhodnihOntologij().send();
@@ -53,6 +57,8 @@ public class Demo {
                 log.info("[IPFS downloaded and write to files]");
                 jenaHelpers.purgeJenaModel();
                 jenaHelpers.loadInputOntologiesIFEmptyDatasetIFReasonerConsistencyCheckInfModelAdd(inputOntologyFilesFromBlockchains);
+            } else {
+                Timer.addDataToCSV("Scenarij", "nadaljevanje", "tip scenarija");
             }
         } else {
             throw new Exception("Neveljavna konfiguracija, podajte vhodne ontologije ali naslov ethereum pogodbe!");
@@ -78,7 +84,7 @@ public class Demo {
         for (String query : SPARQLQueries) {
             log.info("[Executing SPARQL from file (.rq)] " + query);
             String timerExecuteSPARQLQuery = timer.start("4."+i+" Izvedba SPARQL poizvedbe");
-            Boolean successful = jenaHelpers.executeSPARQL(query, inputOntologyFiles, ipfsHelpers, ethereumHelpers);
+            Boolean successful = jenaHelpers.executeSPARQL(query, inputOntologyFiles.get(), ipfsHelpers, ethereumHelpers);
             timer.stop(timerExecuteSPARQLQuery);
             if (!successful) {
                 log.severe("SPARQL query wasn't applied to the dataset. Finishing program execution.");
@@ -88,8 +94,7 @@ public class Demo {
             // jenaHelpers.printDatasetToStandardOutput();
         }
 
-        timer.stop(totalTimeOfProgram);
-        Timer.closeWriter();
+        Timer.finish();
     }
 
 }
