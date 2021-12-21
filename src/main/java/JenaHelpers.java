@@ -39,7 +39,7 @@ class ModelListener extends StatementListener {
 }
 
 public class JenaHelpers {
-    private static String datasetLocation = "target/dataset";
+    private static String datasetLocation;
     private static Boolean useReasoner;
     private Dataset dataset;
     private Model model;
@@ -52,7 +52,8 @@ public class JenaHelpers {
     private static final Logger log = Logger.getLogger(JenaHelpers.class.getName());
     private static Timer timer = Timer.getInstance();
 
-    public JenaHelpers(Boolean useReasoner) {
+    public JenaHelpers(Boolean useReasoner, String configurationName) {
+        this.datasetLocation = "target/dataset-" + configurationName;
         this.useReasoner = useReasoner;
         log.setLevel(Level.FINE);
         dataset = TDB2Factory.connectDataset(Location.create(datasetLocation));

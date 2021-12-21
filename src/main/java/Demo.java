@@ -1,3 +1,6 @@
+import org.web3j.crypto.WalletUtils;
+
+import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -7,13 +10,13 @@ public class Demo {
 
     private static final Logger log = Logger.getLogger(Demo.class.getName());
     private static final String sparqlMigrationDirectory = "ipfs-files/output/sparql-migration-$CID.ru";
-
+    private static final String basePath = "src/main/java/";
     public static void main(String[] args) throws Exception {
         ScenarioManager.cleanUpIPFS();
         ScenarioManager.cleanRDFDatabase();
         Timer timer = Timer.getInstance();
-
-        ConfigLoader configLoader = new ConfigLoader("src/main/java/konfiguracija.yaml");
+        String configurationName = args[0];
+        ConfigLoader configLoader = new ConfigLoader(basePath+configurationName);
         IPFSHelpers ipfsHelpers = new IPFSHelpers(configLoader);
         EthereumHelpers ethereumHelpers = new EthereumHelpers(configLoader);
 
@@ -22,7 +25,7 @@ public class Demo {
 
         // Connects to Apache Jena dataset, creates empty one if not existent
         Timer.addDataToCSV("sklepanje", configLoader.uporabiSklepanje().toString(), "boolean");
-        JenaHelpers jenaHelpers = new JenaHelpers(configLoader.uporabiSklepanje());
+        JenaHelpers jenaHelpers = new JenaHelpers(configLoader.uporabiSklepanje(), configurationName);
         Optional<String> ethereumContractAddress = jenaHelpers.retrieveEthContractAddressFromRDFDatabase();
 
         // Save them on blockchains
