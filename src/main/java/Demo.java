@@ -16,6 +16,7 @@ public class Demo {
         ScenarioManager.cleanRDFDatabase();
         Timer timer = Timer.getInstance();
         String configurationName = args[0];
+        Timer.addDataToCSV("Konfiguracija", configurationName, "ime");
         ConfigLoader configLoader = new ConfigLoader(basePath+configurationName);
         IPFSHelpers ipfsHelpers = new IPFSHelpers(configLoader);
         EthereumHelpers ethereumHelpers = new EthereumHelpers(configLoader);
