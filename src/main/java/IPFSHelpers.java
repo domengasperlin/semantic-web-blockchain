@@ -15,6 +15,7 @@ public class IPFSHelpers {
     public IPFSHelpers(ConfigLoader configLoader) {
         String IPFSNodeAddress = (String) configLoader.getIPFS().get("naslovVozlisca");
         this.ipfs = new IPFS(IPFSNodeAddress);
+        
     }
 
     public Multihash uploadLocalFileToIPFS(String fileName) {
@@ -28,29 +29,6 @@ public class IPFSHelpers {
             e.printStackTrace();
         }
         return hash;
-    }
-
-
-    public void uploadByteFile(String fileName, String content) {
-        try {
-            NamedStreamable.ByteArrayWrapper file = new NamedStreamable.ByteArrayWrapper(fileName, content.getBytes());
-            MerkleNode addResult = ipfs.add(file).get(0);
-            System.out.println(addResult);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String retrieveFileContents(String cid) {
-        Multihash filePointer = Multihash.fromBase58(cid);
-        try {
-            byte[] fileContents = ipfs.cat(filePointer);
-            String fileContentsToString = new String(fileContents, StandardCharsets.UTF_8);
-            return fileContentsToString;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 
