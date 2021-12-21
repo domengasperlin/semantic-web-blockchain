@@ -16,8 +16,7 @@ public class IPFSHelpers {
     public IPFSHelpers(ConfigLoader configLoader) {
         String IPFSNodeAddress = (String) configLoader.getIPFS().get("naslovVozlisca");
         MultiAddress multiAddress = new MultiAddress(IPFSNodeAddress);
-        this.ipfs = new IPFS(multiAddress.getHost(), multiAddress.getTCPPort(), "/api/v0/", 600*1000, 600*1000, multiAddress.toString().contains("/https"));
-        
+        this.ipfs = new IPFS(multiAddress.getHost(), multiAddress.getTCPPort(), "/api/v0/", 5*60*1000, 5*60*1000, multiAddress.toString().contains("/https"));
     }
 
     public Multihash uploadLocalFileToIPFS(String fileName) {

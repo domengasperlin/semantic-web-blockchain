@@ -17,7 +17,7 @@ public class Demo {
         String configurationName = args[0];
         sparqlMigrationDirectory = "ipfs-files/"+configurationName+"-sparql-migration-$CID.ru";
         Timer.addDataToCSV("Konfiguracija", configurationName, "ime");
-        ConfigLoader configLoader = new ConfigLoader(basePath+configurationName);
+        ConfigLoader configLoader = new ConfigLoader(basePath+configurationName+".yaml");
         IPFSHelpers ipfsHelpers = new IPFSHelpers(configLoader);
         EthereumHelpers ethereumHelpers = new EthereumHelpers(configLoader);
 
@@ -30,8 +30,8 @@ public class Demo {
         Optional<String> ethereumContractAddress = jenaHelpers.retrieveEthContractAddressFromRDFDatabase();
 
         // TODO: hack to load smart contract address from previous scenario
-        String ScenarioAConfigurationName = "konfiguracijaA.yaml";
-        if (configurationName.equals("konfiguracijaB.yaml")) {
+        String ScenarioAConfigurationName = "konfiguracijaA";
+        if (configurationName.equals("konfiguracijaB")) {
             ethereumContractAddress = new JenaHelpers(false, ScenarioAConfigurationName).retrieveEthContractAddressFromRDFDatabase();
         }
 
@@ -58,7 +58,8 @@ public class Demo {
                     String inputOntologyPath = restoredOntologiesDirectory.replace("$CID", inputOntologyCID);
                     if (i.signum() == 0) {
                         // TODO: this could be improved, proposition the first input file format will be nt
-                        inputOntologyPath = "rdf-sparql/ontologija-obnovljena/vhodna-ontologija-$CID.nt.bz2".replace("$CID", inputOntologyCID);
+                        // TODO: dbpedia uncomment below
+//                        inputOntologyPath = "rdf-sparql/ontologija-obnovljena/vhodna-ontologija-$CID.nt.bz2".replace("$CID", inputOntologyCID);
                     }
                     // Download ontology from IPFS
                     String timerGetIPFSFile = timer.start("R. Prenesi vhodno ontologijo iz IPFS");
@@ -99,8 +100,7 @@ public class Demo {
             Boolean successful = jenaHelpers.executeSPARQL(query, ipfsHelpers, ethereumHelpers);
             timer.stop(timerExecuteSPARQLQuery);
             if (!successful) {
-                log.severe("SPARQL query wasn't applied to the dataset. Finishing program execution.");
-                break;
+                log.info("SPARQL query wasn't applied to the dataset.");
             }
             i++;
             // jenaHelpers.printDatasetToStandardOutput();
