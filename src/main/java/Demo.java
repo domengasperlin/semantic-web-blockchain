@@ -59,7 +59,7 @@ public class Demo {
                     if (i.signum() == 0) {
                         // TODO: this could be improved, proposition the first input file format will be nt
                         // TODO: dbpedia uncomment below
-//                        inputOntologyPath = "rdf-sparql/ontologija-obnovljena/vhodna-ontologija-$CID.nt.bz2".replace("$CID", inputOntologyCID);
+                        inputOntologyPath = "rdf-sparql/ontologija-obnovljena/vhodna-ontologija-$CID.nt.bz2".replace("$CID", inputOntologyCID);
                     }
                     // Download ontology from IPFS
                     String timerGetIPFSFile = timer.start("R. Prenesi vhodno ontologijo iz IPFS");
