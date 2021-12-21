@@ -139,7 +139,7 @@ public class JenaHelpers {
         return true;
     }
 
-    public Boolean executeSPARQL(String SPARQLQueryFileLocation, ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) throws IOException {
+    public Boolean executeSPARQL(String SPARQLQueryFileLocation, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) throws IOException {
         File file = new File(SPARQLQueryFileLocation);
         Boolean executeSelect = false;
         String sparqlQueryString = "";
@@ -173,7 +173,7 @@ public class JenaHelpers {
                 return false;
             }
 
-            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, sparqlQueryString, ipfsHelpers, inputOntologyFiles, ethereumHelpers);
+            return executeSPARQLUpdateAction(SPARQLQueryFileLocation, sparqlQueryString, ipfsHelpers, ethereumHelpers);
         }
 
     }
@@ -199,7 +199,7 @@ public class JenaHelpers {
         return true;
     }
 
-    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, String sparqlString, IPFSHelpers ipfsHelpers, ArrayList<String> inputOntologyFiles, EthereumHelpers ethereumHelpers) {
+    private Boolean executeSPARQLUpdateAction(String locationOfSPARQL, String sparqlString, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         dataset.begin(ReadWrite.WRITE);
         String timerRdfExecuteSPARQL = timer.start("4.x Izvedi SPARQL posodobitev nad bazo RDF");
         UpdateAction.parseExecute(sparqlString, this.model);
@@ -268,9 +268,8 @@ public class JenaHelpers {
 
     public void uploadInputOntologyFilesToBlockchains(ArrayList<String> inputOntologyFiles, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {
         int i = 0;
-        String timerInputOntologyOnBlockchain = timer.start("2. Vhodna ontologije na verige blokov");
         for (String inputOntologyFile : inputOntologyFiles) {
-            String timerInputOntologyToIPFS = timer.start("2."+i+" Objava vhodne ontologije na IPFS");
+            String timerInputOntologyToIPFS = timer.start("2."+i+" Objava vhodne ontologije "+inputOntologyFile+ " na IPFS");
             String xBoxCID = ipfsHelpers.uploadLocalFileToIPFS(inputOntologyFile).toString();
             timer.stop(timerInputOntologyToIPFS);
             log.info("[IPFS upload content identifier] " + xBoxCID);
@@ -279,13 +278,12 @@ public class JenaHelpers {
                 TransactionReceipt transaction = ethereumHelpers.getContract().dodajVhodnoOntologijo(xBoxCID).send();
                 timer.stop(timerPostCIDToETH);
                 log.info("[ETH] transaction: " + transaction.getTransactionHash());
-                Timer.addDataToCSV("2."+i+" Objava CID-a vhodne ontologije na ETH", transaction.getGasUsed().toString(), "plin");
+                Timer.addDataToCSV("2."+i+" Objava CID-a vhodne ontologije "+inputOntologyFile+ " na ETH", transaction.getGasUsed().toString(), "plin");
             } catch (Exception e) {
                 e.printStackTrace();
             }
             i++;
         }
-        timer.stop(timerInputOntologyOnBlockchain);
     }
 
     public void uploadChangesToBlockchains(String locationOfSparql, IPFSHelpers ipfsHelpers, EthereumHelpers ethereumHelpers) {

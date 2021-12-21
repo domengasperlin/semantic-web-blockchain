@@ -80,7 +80,6 @@ public class EthereumHelpers {
         Timer.addDataToCSV("1. Objava ETH pogodbe", gasUsed.toString(), "gas");
         String contractAddress = helloWorld.getContractAddress();
         log.info("[ETH] contract address: " + contractAddress);
-        Timer.addDataToCSV("Naslov pametne pogodbe", contractAddress, "hex");
         loadContractAtAddress(contractAddress);
         return contractAddress;
     }

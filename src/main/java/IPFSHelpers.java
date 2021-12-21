@@ -1,6 +1,7 @@
 import io.ipfs.api.IPFS;
 import io.ipfs.api.MerkleNode;
 import io.ipfs.api.NamedStreamable;
+import io.ipfs.multiaddr.MultiAddress;
 import io.ipfs.multihash.Multihash;
 
 import java.io.File;
@@ -14,7 +15,8 @@ public class IPFSHelpers {
 
     public IPFSHelpers(ConfigLoader configLoader) {
         String IPFSNodeAddress = (String) configLoader.getIPFS().get("naslovVozlisca");
-        this.ipfs = new IPFS(IPFSNodeAddress);
+        MultiAddress multiAddress = new MultiAddress(IPFSNodeAddress);
+        this.ipfs = new IPFS(multiAddress.getHost(), multiAddress.getTCPPort(), "/api/v0/", 600*1000, 600*1000, multiAddress.toString().contains("/https"));
         
     }
 
