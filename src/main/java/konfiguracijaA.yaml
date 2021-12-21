@@ -1,0 +1,29 @@
+ontologija:
+  naloziIzDatotek:
+#---IZOBRAZEVANJE---
+#    - rdf-sparql/ontologija-izobrazevanje/izobrazevanje.ttl.bz2
+#---DBPEDIA---
+    - rdf-sparql/ontologija-dbpedia/ontology--DEV_type=parsed.nt.bz2
+    - rdf-sparql/ontologija-dbpedia/homepages_lang=en.ttl.bz2
+    - rdf-sparql/ontologija-dbpedia/instance-types_lang=en_specific.ttl.bz2
+    - rdf-sparql/ontologija-dbpedia/specific-mappingbased-properties_lang=en.ttl.bz2
+  poizvedbeSPARQL:
+#---IZOBRAZEVANJE---
+#    - rdf-sparql/poizvedbe-dbpedia/0-select-dbpedia-triples.ru
+#    - rdf-sparql/poizvedbe-izobrazevanje/select-abox.ru
+#    - rdf-sparql/poizvedbe-izobrazevanje/delete-abox.ru
+#---DBPEDIA---
+#    - rdf-sparql/poizvedbe-dbpedia/0-select-dbpedia-triples.ru
+    - rdf-sparql/poizvedbe-dbpedia/1-select-dbpedia-songs.ru
+    - rdf-sparql/poizvedbe-dbpedia/2-delete-dbpedia-song.ru
+  uporabiSklepanje: false
+IPFS:
+  naslovVozlisca: /ip4/127.0.0.1/tcp/5001
+Ethereum:
+#---GANACHE---
+#  naslovVozlisca: http://localhost:8545
+#  zasebniKljucDenarnice: "97b3900860ef91192f7cdfe3a9268bd2e9c6a245994d513297dcf7e0a1d55d32"
+#---RINKEBY---
+  naslovVozlisca: https://rinkeby.infura.io/v3/18b69a4069f7455ba4486efd1f5530b1
+  lokacijaDenarnice: ethereum/wallet--c261cf8e7283030d0b6fa672b5d15819c8d99aa3
+  gesloDenarnice: demo

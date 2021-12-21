@@ -2,6 +2,7 @@ import contracts.Shramba;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Convert;
@@ -21,6 +22,7 @@ public class EthereumHelpers {
     public EthereumHelpers(ConfigLoader configLoader) {
         String ethereumNodeAddress = (String) configLoader.getEthereum().get("naslovVozlisca");
         this.web3 = Web3j.build(new HttpService(ethereumNodeAddress));
+
         if (configLoader.isDevelopment()) {
             // Ganache specific
             gasLimit = BigInteger.valueOf(6721975);
@@ -78,7 +80,6 @@ public class EthereumHelpers {
         Timer.addDataToCSV("1. Objava ETH pogodbe", gasUsed.toString(), "gas");
         String contractAddress = helloWorld.getContractAddress();
         log.info("[ETH] contract address: " + contractAddress);
-        Timer.addDataToCSV("Naslov pametne pogodbe", contractAddress, "hex");
         loadContractAtAddress(contractAddress);
         return contractAddress;
     }

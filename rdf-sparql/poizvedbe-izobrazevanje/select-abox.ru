@@ -1,1 +1,1 @@
-SELECT ?student where {?student <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#jeVpisan> <http://www.semanticweb.org/domen/ontologies/2021/4/izobrazevanje#Prvi_letnik>}
+SELECT ?student ?kam where {?student <http://www.example.com/izobrazevanje#jeVpisan> ?kam}

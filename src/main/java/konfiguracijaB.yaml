@@ -1,0 +1,19 @@
+ontologija:
+  poizvedbeSPARQL:
+#---IZOBRAZEVANJE---
+#    - rdf-sparql/poizvedbe-izobrazevanje/select-abox.ru
+#    - rdf-sparql/poizvedbe-izobrazevanje/insert-abox.ru
+#---DBPEDIA---
+    - rdf-sparql/poizvedbe-dbpedia/1-select-dbpedia-songs.ru
+    - rdf-sparql/poizvedbe-dbpedia/3-insert-dbpedia-song.ru
+  uporabiSklepanje: false
+IPFS:
+  naslovVozlisca: /ip4/127.0.0.1/tcp/5001
+Ethereum:
+#---GANACHE---
+#  naslovVozlisca: http://localhost:8545
+#  zasebniKljucDenarnice: "0x500beca3d3b7a6bd3725ca5e9fedadaf18f6bace2d8c052bc2d554d508be67eb"
+#---RINKEBY---
+  naslovVozlisca: https://rinkeby.infura.io/v3/18b69a4069f7455ba4486efd1f5530b1
+  lokacijaDenarnice: ethereum/wallet--88bdf353a1dfc675557427aa3eaf85dbd0de1279
+  gesloDenarnice: demo2
