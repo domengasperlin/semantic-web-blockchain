@@ -34,7 +34,7 @@ In order to connect to other Ethereum node change ethereum/nodeAddress in config
 set heap space big enough to input ontology files e.g. -ea -Xmx2048m
 
 ### Run program on the dataset from the article Blockchain-based transaction manager for ontology databases
-We have run three configurations sequentially (A, B and C), (A, B and C), ... several times. 
+We have run three configurations (A, B and C) in that order several times. After C we started with A again.
 Three run configurations in XML format used for scenarios A,B,C are available in folder `.idea/runConfigurations`
 Jetbrains editor will load configurations when opening the project.
 For each run of the configuration csv file with measurements of the run gets created which were used for the analysis of results. 
