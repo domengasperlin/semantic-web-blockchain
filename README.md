@@ -30,22 +30,12 @@ In order to connect to other Ethereum node change ethereum/nodeAddress in config
 ### Run IPFS node
 [IPFS](https://ipfs.io/#install)
 
-### Generating LUBM dataset
-```bash
-java -cp classes/ edu.lehigh.swat.bench.uba.Generator -univ 1 -seed 0 -onto http://swat.cse.lehigh.edu/onto/univ-bench.owl
-```
-
-### Loading rdf data into database quickly
-[tdbloader](https://jena.apache.org/documentation/tdb/commands.html#installation)
-Load toy ontology 
-```bash
-tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/ontologija-izobrazevanje/izobrazevanje.ttl
-```
-or subset of DBpedia
-```bash
-tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/ontologija-dbpedia/ABox_DBpedia_instance-types_lang=en_specific.ttl.gz 
-tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/ontologija-dbpedia/TBox_DBpedia_ontology_type=parsed.xml
-```
-
 ### Run program
 set heap space big enough to input ontology files e.g. -ea -Xmx2048m
+
+### Run program on the dataset from the article Blockchain-based transaction manager for ontology databases
+We have run three configurations (A, B and C) in that order several times. After C we started with A again.
+Three run configurations in XML format used for scenarios A,B,C are available in folder `.idea/runConfigurations`
+Jetbrains editor will load configurations when opening the project.
+For each run of the configuration csv file with measurements of the run gets created which were used for the analysis of results. 
+ 
