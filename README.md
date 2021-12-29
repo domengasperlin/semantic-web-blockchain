@@ -49,3 +49,8 @@ tdb2.tdbloader --loc ./target/dataset ./rdf-sparql/ontologija-dbpedia/TBox_DBped
 
 ### Run program
 set heap space big enough to input ontology files e.g. -ea -Xmx2048m
+
+### Run program on the dataset from the article Blockchain-based transaction manager for ontology databases
+We have run configurations A,B,C sequentially (A, B and C) several times. 
+Configurations in XML format for scenarios A,B,C are available in the folder `.idea/runConfigurations/Demo_A_runs_again.xml`
+However opening the project with Jetbrains editor will load them automatically. 

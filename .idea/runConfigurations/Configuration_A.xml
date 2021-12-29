@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Configuration A" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="corretto-11" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="MAIN_CLASS_NAME" value="Demo" />
+    <module name="sb" />
+    <option name="PROGRAM_PARAMETERS" value="konfiguracijaA" />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="clean up rdf databases" run_configuration_type="ShConfigurationType" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="checkout update queries" run_configuration_type="ShConfigurationType" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="clean up ipfs" run_configuration_type="ShConfigurationType" />
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
