@@ -104,8 +104,9 @@ public class JenaHelpers {
 
     public Boolean isOntologyConsistent(Model targetModel, Boolean addInferenceModelFromReasoner) {
         OntModelSpec reasonerSpec = OntModelSpec.RDFS_MEM;
-        String timerWouldOntologyBeConsistent = timer.start("J. Pridobi tranzitivne zakonitosti in preveri konsistenostnost ontologij "+reasonerSpec.getLanguage());
-        Reasoner reasoner = ReasonerRegistry.getOWLReasoner();
+        String timerWouldOntologyBeConsistent = timer.start("J2. Pridobi tranzitivne zakonitosti in preveri konsistenostnost ontologij "+reasonerSpec.getLanguage());
+        Reasoner reasoner = ReasonerRegistry.getRDFSReasoner();
+        reasoner = reasoner.bindSchema(targetModel);
         OntModelSpec ontModelSpec = new OntModelSpec(reasonerSpec);
         ontModelSpec.setReasoner(reasoner);
         InfModel infModel = ModelFactory.createOntologyModel(ontModelSpec, targetModel);
@@ -130,7 +131,7 @@ public class JenaHelpers {
             if (addInferenceModelFromReasoner) {
                 String timerAddInferredAxioms = timer.start("J. Dodaj tranzitivne zakonitosti v Jena bazo");
                 dataset.begin(ReadWrite.WRITE);
-                this.model.add(infModel);
+                this.model = infModel;
                 dataset.commit();
                 dataset.end();
                 timer.stop(timerAddInferredAxioms);
@@ -203,7 +204,7 @@ public class JenaHelpers {
         dataset.begin(ReadWrite.WRITE);
         String timerRdfExecuteSPARQL = timer.start("4.x Izvedi SPARQL posodobitev nad bazo RDF");
         UpdateAction.parseExecute(sparqlString, this.model);
-
+        timer.stop(timerRdfExecuteSPARQL);
         if (this.useReasoner) {
             // TODO: handle duplicate inferences that would be added to the model if we pass true here. UPDATE?
             Boolean isConsistent = isOntologyConsistent(this.model, false);
@@ -214,7 +215,6 @@ public class JenaHelpers {
             dataset.commit();
             dataset.end();
         }
-        timer.stop(timerRdfExecuteSPARQL);
         uploadChangesToBlockchains(locationOfSPARQL, ipfsHelpers, ethereumHelpers);
         return true;
 
@@ -295,7 +295,9 @@ public class JenaHelpers {
         }
         try {
             String addMigrationCIDToETH = timer.start("4.x Nalozi CID migracije na ETH");
-            ethereumHelpers.getContract().dodajMigracijo(sparqlQueryCID).send();
+            TransactionReceipt transactionReceipt = ethereumHelpers.getContract().dodajMigracijo(sparqlQueryCID).send();
+            Timer.addDataToCSV("4.x Nalozi CID migracije na ETH", transactionReceipt.getGasUsed().toString(), "plin");
+
             timer.stop(addMigrationCIDToETH);
             saveRanSparqlMigrationToRDFDatabase(sparqlQueryCID);
         } catch (Exception e) {
